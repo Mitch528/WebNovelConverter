@@ -83,14 +83,30 @@ namespace WebNovelConverter.Sources
                     if (string.IsNullOrEmpty(content))
                         content = postNode.SelectSingleNode(".//*[contains(@class, 'entry-title']").OuterHtml;
                 }
+                else
+                {
+                    HtmlNode contentNode = doc.GetElementbyId("content");
+
+                    if (contentNode != null)
+                    {
+                        HtmlNode headLineNode = contentNode.SelectSingleNode(".//*[@class='entry-headline']");
+
+                        content = headLineNode.OuterHtml;
+                    }
+                }
 
                 HtmlNode entryNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'postbody')]");
                 
                 if (entryNode == null)
                     entryNode = doc.DocumentNode.SelectSingleNode("//div[@class='entry-content']");
 
+                var paraNodes = entryNode.SelectNodes("p");
+
+                if (paraNodes == null)
+                    paraNodes = entryNode.SelectNodes(".//p");
+
                 content += string.Join(string.Empty,
-                        entryNode.SelectNodes("p").SelectMany(p => p.OuterHtml));
+                        paraNodes.SelectMany(p => p.OuterHtml));
             }
             else
             {
