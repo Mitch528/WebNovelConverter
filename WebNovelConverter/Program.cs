@@ -6,16 +6,33 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using WebNovelConverter.Config;
 using WebNovelConverter.Sources;
 
 namespace WebNovelConverter
 {
     class Program
     {
+        private const string ConfigFile = "converter.json";
+
+        private static ConverterConfig _config;
+
         private static StreamWriter _swriter;
 
         static void Main(string[] args)
         {
+
+            if (!File.Exists(ConfigFile))
+            {
+                _config = new ConverterConfig();
+                File.WriteAllText(ConfigFile, JsonConvert.SerializeObject(_config, Formatting.Indented));
+            }
+            else
+            {
+                _config = JsonConvert.DeserializeObject<ConverterConfig>(File.ReadAllText(ConfigFile));
+            }
+
             string url = string.Join(" ", args);
 
             if (string.IsNullOrEmpty(url))
@@ -49,7 +66,7 @@ namespace WebNovelConverter
             };
 
             WordPress wp = new WordPress();
-            var chapters = wp.GetChaptersAsync(url, progress).Result;
+            var chapters = wp.GetChaptersAsync(url, _config.DelayPerChapterSeconds, progress).Result;
 
             string fName = string.Format("{0}.html", name);
 

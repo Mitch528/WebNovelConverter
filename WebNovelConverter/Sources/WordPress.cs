@@ -9,7 +9,7 @@ namespace WebNovelConverter.Sources
 {
     public class WordPress : WebNovelSource
     {
-        public override async Task<List<WebNovelChapter>> GetChaptersAsync(string baseUrl, IProgress<string> progress)
+        public override async Task<List<WebNovelChapter>> GetChaptersAsync(string baseUrl, int delayPer, IProgress<string> progress)
         {
             string baseContent = await GetWebPage(baseUrl);
 
@@ -27,7 +27,6 @@ namespace WebNovelConverter.Sources
             var linkNodes = entryNode.SelectNodes(".//a")
                 .Where(p => p.InnerText.IndexOf("chapter", StringComparison.CurrentCultureIgnoreCase) >= 0);
 
-            var tasks = new List<Task>();
             var chapters = new List<WebNovelChapter>();
 
             int ctr = 1;
@@ -52,10 +51,8 @@ namespace WebNovelConverter.Sources
 
                 ctr++;
 
-                //await Task.Delay(TimeSpan.FromSeconds(5));
+                await Task.Delay(delayPer);
             }
-
-            await Task.WhenAll(tasks);
 
             progress.Report("Finished processing chapters!");
 
@@ -111,15 +108,18 @@ namespace WebNovelConverter.Sources
 
                 if (entryNode == null)
                     entryNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'post-content')]");
+                
+                if (entryNode != null)
+                {
+                    var paraNodes = entryNode.SelectNodes("p|h1|h2|h3");
 
-                var paraNodes = entryNode.SelectNodes("p|h1|h2|h3");
+                    if (paraNodes == null)
+                        paraNodes = entryNode.SelectNodes(".//p|.//h1|.//h2|.//h3");
 
-                if (paraNodes == null)
-                    paraNodes = entryNode.SelectNodes(".//p|.//h1|.//h2|.//h3");
-
-                if (paraNodes != null)
-                    content += string.Join(string.Empty,
-                            paraNodes.SelectMany(p => p.OuterHtml));
+                    if (paraNodes != null)
+                        content += string.Join(string.Empty,
+                                paraNodes.SelectMany(p => p.OuterHtml));
+                }
             }
 
             return new WebNovelChapter

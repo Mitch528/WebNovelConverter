@@ -9,7 +9,7 @@ namespace WebNovelConverter.Sources
 {
     public abstract class WebNovelSource
     {
-        public abstract Task<List<WebNovelChapter>> GetChaptersAsync(string url, IProgress<string> progress);
+        public abstract Task<List<WebNovelChapter>> GetChaptersAsync(string url, int delayPer, IProgress<string> progress);
 
         public abstract Task<WebNovelChapter> GetChapterAsync(string url);
 
