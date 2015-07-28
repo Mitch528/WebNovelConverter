@@ -21,6 +21,9 @@ namespace WebNovelConverter.Sources
             if (entryNode == null)
                 entryNode = baseDoc.DocumentNode.SelectSingleNode("//div[@class='entry']");
 
+            if (entryNode == null)
+                entryNode = baseDoc.DocumentNode.SelectSingleNode("//div[contains(@class, 'post-content')]");
+
             var linkNodes = entryNode.SelectNodes(".//a")
                 .Where(p => p.InnerText.IndexOf("chapter", StringComparison.CurrentCultureIgnoreCase) >= 0);
 
@@ -30,29 +33,26 @@ namespace WebNovelConverter.Sources
             int ctr = 1;
             foreach (HtmlNode linkNode in linkNodes)
             {
-                int ctr0 = ctr;
+                string chapterName = linkNode.InnerText.Trim();
 
-                tasks.Add(Task.Run(async () =>
+                try
                 {
-                    string chapterName = linkNode.InnerText.Trim();
+                    WebNovelChapter chapter = await GetChapterAsync(linkNode.Attributes["href"].Value);
+                    chapter.ChapterId = ctr;
 
-                    try
-                    {
-                        WebNovelChapter chapter = await GetChapterAsync(linkNode.Attributes["href"].Value);
-                        chapter.ChapterId = ctr0;
+                    chapters.Add(chapter);
 
-                        chapters.Add(chapter);
-
-                        progress.Report(string.Format("{0} has been processed ({1})", chapterName, ctr0));
-                    }
-                    catch (Exception ex)
-                    {
-                        progress.Report(string.Format("Error processing {0}", chapterName));
-                        progress.Report(ex.ToString());
-                    }
-                }));
+                    progress.Report(string.Format("{0} has been processed ({1})", chapterName, ctr));
+                }
+                catch (Exception ex)
+                {
+                    progress.Report(string.Format("Error processing {0}", chapterName));
+                    progress.Report(ex.ToString());
+                }
 
                 ctr++;
+
+                //await Task.Delay(TimeSpan.FromSeconds(5));
             }
 
             await Task.WhenAll(tasks);
@@ -69,48 +69,57 @@ namespace WebNovelConverter.Sources
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(pageContent);
 
-            HtmlNode postNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'page')]");
+            HtmlNode contentNode = doc.GetElementbyId("content");
+            HtmlNode pageNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'page')]");
+            HtmlNode postNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'post')]");
             HtmlNode articleNode = doc.DocumentNode.SelectSingleNode("//article");
 
             string content = string.Empty;
 
+            if (articleNode != null)
+            {
+                content = articleNode.InnerHtml;
+            }
+            else if (pageNode != null)
+            {
+                content = pageNode.SelectSingleNode(".//*[contains(@class, 'title')]").OuterHtml;
+
+                if (string.IsNullOrEmpty(content))
+                    content = pageNode.SelectSingleNode(".//*[contains(@class, 'entry-title']").OuterHtml;
+            }
+            else if (postNode != null)
+            {
+                HtmlNode titleNode = postNode.SelectSingleNode(".//*[contains(@class, 'post-title')]");
+
+                if (titleNode != null)
+                    content = titleNode.OuterHtml;
+            }
+            else if (contentNode != null)
+            {
+                HtmlNode headLineNode = contentNode.SelectSingleNode(".//*[@class='entry-headline']");
+
+                if (headLineNode != null)
+                    content = headLineNode.OuterHtml;
+            }
+
             if (articleNode == null)
             {
-                if (postNode != null)
-                {
-                    content = postNode.SelectSingleNode(".//*[contains(@class, 'title')]").OuterHtml;
-
-                    if (string.IsNullOrEmpty(content))
-                        content = postNode.SelectSingleNode(".//*[contains(@class, 'entry-title']").OuterHtml;
-                }
-                else
-                {
-                    HtmlNode contentNode = doc.GetElementbyId("content");
-
-                    if (contentNode != null)
-                    {
-                        HtmlNode headLineNode = contentNode.SelectSingleNode(".//*[@class='entry-headline']");
-
-                        content = headLineNode.OuterHtml;
-                    }
-                }
-
                 HtmlNode entryNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'postbody')]");
-                
+
                 if (entryNode == null)
                     entryNode = doc.DocumentNode.SelectSingleNode("//div[@class='entry-content']");
 
-                var paraNodes = entryNode.SelectNodes("p");
+                if (entryNode == null)
+                    entryNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'post-content')]");
+
+                var paraNodes = entryNode.SelectNodes("p|h1|h2|h3");
 
                 if (paraNodes == null)
-                    paraNodes = entryNode.SelectNodes(".//p");
+                    paraNodes = entryNode.SelectNodes(".//p|.//h1|.//h2|.//h3");
 
-                content += string.Join(string.Empty,
-                        paraNodes.SelectMany(p => p.OuterHtml));
-            }
-            else
-            {
-                content = articleNode.InnerHtml;
+                if (paraNodes != null)
+                    content += string.Join(string.Empty,
+                            paraNodes.SelectMany(p => p.OuterHtml));
             }
 
             return new WebNovelChapter

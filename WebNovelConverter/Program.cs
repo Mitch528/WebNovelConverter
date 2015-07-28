@@ -42,7 +42,10 @@ namespace WebNovelConverter
                 Console.WriteLine(e);
 
                 if (_swriter != null)
+                {
                     _swriter.WriteLine(e);
+                    _swriter.Flush();
+                }
             };
 
             WordPress wp = new WordPress();
