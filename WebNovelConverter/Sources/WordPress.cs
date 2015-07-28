@@ -16,10 +16,10 @@ namespace WebNovelConverter.Sources
             HtmlDocument baseDoc = new HtmlDocument();
             baseDoc.LoadHtml(baseContent);
 
-            HtmlNode entryNode = baseDoc.DocumentNode.SelectSingleNode("//div[@class='entry-content']");
+            HtmlNode entryNode = baseDoc.DocumentNode.SelectSingleNode("//div[contains(@class, 'entry-content')]");
 
             if (entryNode == null)
-                entryNode = baseDoc.DocumentNode.SelectSingleNode("//div[@class='entry']");
+                entryNode = baseDoc.DocumentNode.SelectSingleNode("//div[contains(@class, 'entry')]");
 
             if (entryNode == null)
                 entryNode = baseDoc.DocumentNode.SelectSingleNode("//div[contains(@class, 'post-content')]");
