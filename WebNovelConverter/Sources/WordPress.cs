@@ -71,7 +71,7 @@ namespace WebNovelConverter.Sources
             return new WebNovelChapter
             {
                 Url = url,
-                Content = articleNode.InnerHtml
+                Content = articleNode != null ? articleNode.InnerHtml : doc.DocumentNode.InnerHtml
             };
         }
     }
