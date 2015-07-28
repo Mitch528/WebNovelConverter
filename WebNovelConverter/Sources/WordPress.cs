@@ -18,6 +18,9 @@ namespace WebNovelConverter.Sources
 
             HtmlNode entryNode = baseDoc.DocumentNode.SelectSingleNode("//div[@class='entry-content']");
 
+            if (entryNode == null)
+                entryNode = baseDoc.DocumentNode.SelectSingleNode("//div[@class='entry']");
+
             var linkNodes = entryNode.SelectNodes(".//a")
                 .Where(p => p.InnerText.IndexOf("chapter", StringComparison.CurrentCultureIgnoreCase) >= 0);
 
@@ -66,12 +69,38 @@ namespace WebNovelConverter.Sources
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(pageContent);
 
+            HtmlNode postNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'page')]");
             HtmlNode articleNode = doc.DocumentNode.SelectSingleNode("//article");
+
+            string content = string.Empty;
+
+            if (articleNode == null)
+            {
+                if (postNode != null)
+                {
+                    content = postNode.SelectSingleNode(".//*[contains(@class, 'title')]").OuterHtml;
+
+                    if (string.IsNullOrEmpty(content))
+                        content = postNode.SelectSingleNode(".//*[contains(@class, 'entry-title']").OuterHtml;
+                }
+
+                HtmlNode entryNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'postbody')]");
+                
+                if (entryNode == null)
+                    entryNode = doc.DocumentNode.SelectSingleNode("//div[@class='entry-content']");
+
+                content += string.Join(string.Empty,
+                        entryNode.SelectNodes("p").SelectMany(p => p.OuterHtml));
+            }
+            else
+            {
+                content = articleNode.InnerHtml;
+            }
 
             return new WebNovelChapter
             {
                 Url = url,
-                Content = articleNode != null ? articleNode.InnerHtml : doc.DocumentNode.InnerHtml
+                Content = content
             };
         }
     }

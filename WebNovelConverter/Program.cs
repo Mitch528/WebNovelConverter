@@ -25,7 +25,7 @@ namespace WebNovelConverter
 
                 return;
             }
-            
+
             Console.Write("Name of web novel: ");
 
             string name = Console.ReadLine();
@@ -40,12 +40,14 @@ namespace WebNovelConverter
             progress.ProgressChanged += (s, e) =>
             {
                 Console.WriteLine(e);
-                _swriter.WriteLine(e);
+
+                if (_swriter != null)
+                    _swriter.WriteLine(e);
             };
 
             WordPress wp = new WordPress();
             var chapters = wp.GetChaptersAsync(url, progress).Result;
-            
+
             string fName = string.Format("{0}.html", name);
 
             using (StreamWriter writer = new StreamWriter(fName))
@@ -57,6 +59,7 @@ namespace WebNovelConverter
             }
 
             _swriter.Close();
+            _swriter = null;
 
             Console.WriteLine("Converting...");
 
