@@ -15,5 +15,10 @@ namespace WebNovelConverter
         public string ChapterName { get; set; }
 
         public string Content { get; set; }
+
+        public override string ToString()
+        {
+            return ChapterName;
+        }
     }
 }

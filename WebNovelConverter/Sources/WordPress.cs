@@ -9,7 +9,7 @@ namespace WebNovelConverter.Sources
 {
     public class WordPress : WebNovelSource
     {
-        public override async Task<List<WebNovelChapter>> GetChaptersAsync(string baseUrl, int delayPer, IProgress<string> progress)
+        public override async Task<ChapterLink[]> GetLinks(string baseUrl)
         {
             string baseContent = await GetWebPage(baseUrl);
 
@@ -24,28 +24,50 @@ namespace WebNovelConverter.Sources
             if (entryNode == null)
                 entryNode = baseDoc.DocumentNode.SelectSingleNode("//div[contains(@class, 'post-content')]");
 
-            var linkNodes = entryNode.SelectNodes(".//a")
-                .Where(p => p.InnerText.IndexOf("chapter", StringComparison.CurrentCultureIgnoreCase) >= 0);
+            var linkNodes = entryNode.SelectNodes(".//a");
 
+            var links = new List<ChapterLink>();
+            foreach (HtmlNode linkNode in linkNodes)
+            {
+                if (string.IsNullOrWhiteSpace(linkNode.InnerText))
+                    continue;
+
+                ChapterLink link = new ChapterLink
+                {
+                    Name = linkNode.InnerText,
+                    Url = linkNode.Attributes["href"].Value,
+                    Unknown = true
+                };
+
+                if (link.Name.IndexOf("chap", StringComparison.CurrentCultureIgnoreCase) >= 0)
+                    link.Unknown = false;
+
+                links.Add(link);
+            }
+
+            return links.ToArray();
+        }
+
+        public override async Task<List<WebNovelChapter>> GetChaptersAsync(string baseUrl, int delayPer, IProgress<string> progress)
+        {
+            ChapterLink[] links = await GetLinks(baseUrl);
             var chapters = new List<WebNovelChapter>();
 
             int ctr = 1;
-            foreach (HtmlNode linkNode in linkNodes)
+            foreach (ChapterLink link in links)
             {
-                string chapterName = linkNode.InnerText.Trim();
-
                 try
                 {
-                    WebNovelChapter chapter = await GetChapterAsync(linkNode.Attributes["href"].Value);
+                    WebNovelChapter chapter = await GetChapterAsync(link.Url);
                     chapter.ChapterId = ctr;
 
                     chapters.Add(chapter);
 
-                    progress.Report(string.Format("{0} has been processed ({1})", chapterName, ctr));
+                    progress.Report(string.Format("{0} has been processed ({1})", link.Name, ctr));
                 }
                 catch (Exception ex)
                 {
-                    progress.Report(string.Format("Error processing {0}", chapterName));
+                    progress.Report(string.Format("Error processing {0}", link.Name));
                     progress.Report(ex.ToString());
                 }
 
@@ -75,7 +97,18 @@ namespace WebNovelConverter.Sources
 
             if (articleNode != null)
             {
-                content = articleNode.InnerHtml;
+                HtmlNode ifNode = articleNode.SelectSingleNode(".//iframe");
+
+                if (ifNode != null)
+                {
+                    string ifUrl = ifNode.Attributes["src"].Value;
+
+                    content = await GetWebPage(ifUrl);
+                }
+                else
+                {
+                    content = articleNode.InnerHtml;
+                }
             }
             else if (pageNode != null)
             {
@@ -108,17 +141,26 @@ namespace WebNovelConverter.Sources
 
                 if (entryNode == null)
                     entryNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'post-content')]");
-                
+
                 if (entryNode != null)
                 {
-                    var paraNodes = entryNode.SelectNodes("p|h1|h2|h3");
+                    HtmlNode ifNode = entryNode.SelectSingleNode(".//iframe");
 
-                    if (paraNodes == null)
-                        paraNodes = entryNode.SelectNodes(".//p|.//h1|.//h2|.//h3");
+                    if (ifNode != null)
+                    {
+                        content = ifNode.InnerHtml;
+                    }
+                    else
+                    {
+                        var paraNodes = entryNode.SelectNodes("p|h1|h2|h3");
 
-                    if (paraNodes != null)
-                        content += string.Join(string.Empty,
-                                paraNodes.SelectMany(p => p.OuterHtml));
+                        if (paraNodes == null)
+                            paraNodes = entryNode.SelectNodes(".//p|.//h1|.//h2|.//h3");
+
+                        if (paraNodes != null)
+                            content += string.Join(string.Empty,
+                                    paraNodes.SelectMany(p => p.OuterHtml));
+                    }
                 }
             }
 
