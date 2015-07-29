@@ -7,7 +7,7 @@ addons:
     packages:
     - p7zip-full
 script:
-- xbuild /p:Configuration=Release WebNovelCreator.sln
+- xbuild /p:Configuration=Release WebNovelConverter.sln
 before_deploy:
 - 7z x -aoa Calibre/portable.zip -oWebNovelConverter/bin/Release/ -r
 - 7z a WebNovelConverter.zip WebNovelConverter/bin/Release/*
