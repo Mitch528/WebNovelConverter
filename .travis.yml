@@ -11,7 +11,7 @@ script:
 before_deploy:
 - mkdir artifacts
 - 7z x -aoa Calibre/portable.zip -oWebNovelConverter/bin/Release/ -r
-- 7z a artifacts/WebNovelConverter.zip WebNovelConverter/bin/Release/*
+- "(cd WebNovelConverter/bin/Release && 7z a ../../../artifacts/WebNovelConverter.zip *)"
 deploy:
   provider: s3
   access_key_id: AKIAICZNOURS4CABZBTA
