@@ -73,12 +73,14 @@ namespace WebNovelConverter
 
             foreach (var item in selected.Cast<object>().ToList())
             {
-                int prevIdx = chaptersListBox.Items.IndexOf(item) - 1;
+                int idx = chaptersListBox.Items.IndexOf(item);
 
-                if (prevIdx > 0)
+                if (idx > 0)
                 {
                     chaptersListBox.Items.Remove(item);
-                    chaptersListBox.Items.Insert(prevIdx, item);
+                    chaptersListBox.Items.Insert(idx - 1, item);
+
+                    chaptersListBox.SelectedIndex = idx - 1;
                 }
             }
         }
@@ -89,10 +91,15 @@ namespace WebNovelConverter
 
             foreach (var item in selected.Cast<object>().ToList())
             {
-                int prevIdx = chaptersListBox.Items.IndexOf(item) + 1;
+                int idx = chaptersListBox.Items.IndexOf(item);
 
-                chaptersListBox.Items.Remove(item);
-                chaptersListBox.Items.Insert(prevIdx, item);
+                if (idx > -1 && idx < chaptersListBox.Items.Count - 1)
+                {
+                    chaptersListBox.Items.Remove(item);
+                    chaptersListBox.Items.Insert(idx + 1, item);
+
+                    chaptersListBox.SelectedIndex = idx + 1;
+                }
             }
 
         }

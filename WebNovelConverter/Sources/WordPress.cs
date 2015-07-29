@@ -112,10 +112,13 @@ namespace WebNovelConverter.Sources
             }
             else if (pageNode != null)
             {
-                content = pageNode.SelectSingleNode(".//*[contains(@class, 'title')]").OuterHtml;
+                HtmlNode titleNode = pageNode.SelectSingleNode(".//*[contains(@class, 'title')]");
 
-                if (string.IsNullOrEmpty(content))
-                    content = pageNode.SelectSingleNode(".//*[contains(@class, 'entry-title']").OuterHtml;
+                if (titleNode == null)
+                    titleNode = pageNode.SelectSingleNode(".//*[contains(@class, 'entry-title')]");
+
+                if (titleNode != null)
+                    content = titleNode.OuterHtml;
             }
             else if (postNode != null)
             {
@@ -126,7 +129,7 @@ namespace WebNovelConverter.Sources
             }
             else if (contentNode != null)
             {
-                HtmlNode headLineNode = contentNode.SelectSingleNode(".//*[@class='entry-headline']");
+                HtmlNode headLineNode = contentNode.SelectSingleNode(".//*[contains(@class, 'entry-headline')]");
 
                 if (headLineNode != null)
                     content = headLineNode.OuterHtml;
@@ -137,7 +140,7 @@ namespace WebNovelConverter.Sources
                 HtmlNode entryNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'postbody')]");
 
                 if (entryNode == null)
-                    entryNode = doc.DocumentNode.SelectSingleNode("//div[@class='entry-content']");
+                    entryNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'entry-content')]");
 
                 if (entryNode == null)
                     entryNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'post-content')]");
@@ -152,10 +155,7 @@ namespace WebNovelConverter.Sources
                     }
                     else
                     {
-                        var paraNodes = entryNode.SelectNodes("p|h1|h2|h3");
-
-                        if (paraNodes == null)
-                            paraNodes = entryNode.SelectNodes(".//p|.//h1|.//h2|.//h3");
+                        var paraNodes = entryNode.SelectNodes(".//p|.//h1|.//h2|.//h3");
 
                         if (paraNodes != null)
                             content += string.Join(string.Empty,
