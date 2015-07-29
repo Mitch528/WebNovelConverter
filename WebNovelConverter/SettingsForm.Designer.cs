@@ -85,6 +85,8 @@
             this.Controls.Add(this.saveButton);
             this.Controls.Add(this.delayNumericUpDown);
             this.Controls.Add(this.label1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.MaximizeBox = false;
             this.Name = "SettingsForm";
             this.Text = "Settings";
             this.Load += new System.EventHandler(this.SettingsForm_Load);

@@ -237,7 +237,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(636, 570);
+            this.ClientSize = new System.Drawing.Size(636, 574);
             this.Controls.Add(this.chaptersListBox);
             this.Controls.Add(this.unknownListBox);
             this.Controls.Add(this.progressBar);
@@ -252,6 +252,8 @@
             this.Controls.Add(this.outputTextBox);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Menu = this.mainMenu1;
             this.Name = "MainForm";
             this.Text = "Web Novel Converter";

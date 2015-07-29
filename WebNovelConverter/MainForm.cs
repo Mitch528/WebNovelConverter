@@ -140,7 +140,9 @@ namespace WebNovelConverter
                 }
             }
 
-            ProcessStartInfo psi = new ProcessStartInfo("ebook-convert.exe",
+            string ebookConvert = Path.Combine("Calibre Portable", "Calibre", "ebook-convert.exe");
+
+            ProcessStartInfo psi = new ProcessStartInfo(ebookConvert,
                 string.Format("\"{0}\" \"{1}\"", newTmpFile, e.Argument));
 
             Process proc = new Process();
