@@ -108,10 +108,11 @@ namespace WebNovelConverter
         {
             DialogResult saveResult = saveFileDialog.ShowDialog();
 
-            if (saveResult == DialogResult.OK)
+            if (saveResult == DialogResult.OK && !convertBackgroundWorker.IsBusy)
             {
                 outputTextBox.ResetText();
                 progressBar.Visible = true;
+                convertButton.Enabled = false;
 
                 string savePath = saveFileDialog.FileName;
 
@@ -163,6 +164,7 @@ namespace WebNovelConverter
             Invoke((MethodInvoker)delegate
             {
                 progressBar.Visible = false;
+                convertButton.Enabled = true;
             });
         }
 
