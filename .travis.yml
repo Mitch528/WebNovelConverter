@@ -9,8 +9,9 @@ addons:
 script:
 - xbuild /p:Configuration=Release WebNovelConverter.sln
 before_deploy:
+- mkdir artifacts
 - 7z x -aoa Calibre/portable.zip -oWebNovelConverter/bin/Release/ -r
-- 7z a WebNovelConverter.zip WebNovelConverter/bin/Release/*
+- 7z a artifacts/WebNovelConverter.zip WebNovelConverter/bin/Release/*
 deploy:
   provider: s3
   access_key_id: AKIAICZNOURS4CABZBTA
@@ -18,7 +19,7 @@ deploy:
   secret_access_key:
     secure: SnuEbOBqgvqRM0G+ASWjWu9Cg3NHMjbVDTeZurYXbS8G6jArpMxQ9e3y8VJfX+JQ7RcIZxP7XQY5zen/K5sk1l+u12QPiUwhCkjHld4Mu9P8NhxozhB/KcaCevfLb9/P32AhsPjUUjA45/iwTx3uUAAjCX0EYTB6v0HXTARR4q+HL+qT8TaY4N2HwpMj8OQo9PUFI2rtkeD6p523rxWGmHPUdPT+FLtMoPLe6iWtxQIOPef09+3IYaI6tleRIcdr1gdI9D/VoD4CKtE3fs/3GdRqyR08Qf2AP7NiEc+HY6E+wm0buUzFI4QFocxpZlox4CTZnjPr3ULCQbru6cEMWIJ1oj+gJH208WwiglQz9fkKfDxTB2hWlqVVw1dTs3TcwUm0dafoym2e/XIoooa4DjhXbvekcN3wdJkxv7W4JkQewhZBkyDlid+5hsQXHfIJMmqcDAjZV7aZoHanlwCrgYkquYeCveFmV4xUSgl6e6hv7AVC8kXyWpzyQNi30FoCd9AO7a2O6SWOftLnetMo+W9zk2l1E0Za6QNFrcORRN2gLS6LCtuJfjs84AD3qdZUTzow5Ny9ke5zgp/Lv1biq+69fQ/Jo0+SJPpNDOznDlVVCyKzm0TuMbrwytTq1QnRJCyZxT9YNzvN3zaCGNjr9agbRU4DAOY1Gy4q24/POlY=
   bucket: webnovels
-  local-dir: /home/travis/build/Mitch528/WebNovelConverter/WebNovelConverter/bin/Release
+  local-dir: /home/travis/build/Mitch528/WebNovelConverter/artifacts
   acl: public_read
   on:
     repo: Mitch528/WebNovelConverter
