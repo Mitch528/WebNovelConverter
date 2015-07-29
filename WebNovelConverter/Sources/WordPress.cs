@@ -124,6 +124,9 @@ namespace WebNovelConverter.Sources
             {
                 HtmlNode titleNode = postNode.SelectSingleNode(".//*[contains(@class, 'post-title')]");
 
+                if (titleNode == null)
+                    titleNode = postNode.SelectSingleNode(".//*[contains(@class, 'entry-title')]");
+
                 if (titleNode != null)
                     content = titleNode.OuterHtml;
             }
