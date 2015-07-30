@@ -148,6 +148,9 @@ namespace WebNovelConverter.Sources
                 if (entryNode == null)
                     entryNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'post-content')]");
 
+                if (entryNode == null)
+                    entryNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'post-entry')]");
+
                 if (entryNode != null)
                 {
                     HtmlNode ifNode = entryNode.SelectSingleNode(".//iframe");
