@@ -154,8 +154,22 @@ namespace WebNovelConverter
 
             string ebookConvert = Path.Combine("Calibre Portable", "Calibre", "ebook-convert.exe");
 
-            ProcessStartInfo psi = new ProcessStartInfo(ebookConvert,
-                string.Format("\"{0}\" \"{1}\"", newTmpFile, e.Argument));
+            StringBuilder argsBuilder = new StringBuilder(string.Format("\"{0}\" \"{1}\" ", newTmpFile, e.Argument));
+
+            Invoke((MethodInvoker)delegate
+            {
+                if (!string.IsNullOrEmpty(titleTextBox.Text))
+                {
+                    argsBuilder.AppendFormat("--title \"{0}\" ", titleTextBox.Text);
+                }
+
+                if (!string.IsNullOrEmpty(coverTextBox.Text))
+                {
+                    argsBuilder.AppendFormat("--cover \"{0}\"", coverTextBox.Text);
+                }
+            });
+
+            ProcessStartInfo psi = new ProcessStartInfo(ebookConvert, argsBuilder.ToString());
 
             Process proc = new Process();
             proc.StartInfo = psi;

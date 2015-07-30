@@ -48,9 +48,13 @@
             this.retrieveBackgroundWorker = new System.ComponentModel.BackgroundWorker();
             this.mainMenu1 = new System.Windows.Forms.MainMenu(this.components);
             this.fileMenuItem = new System.Windows.Forms.MenuItem();
-            this.exitMenuItem = new System.Windows.Forms.MenuItem();
             this.settingsMenuItem = new System.Windows.Forms.MenuItem();
             this.menuItem4 = new System.Windows.Forms.MenuItem();
+            this.exitMenuItem = new System.Windows.Forms.MenuItem();
+            this.label4 = new System.Windows.Forms.Label();
+            this.titleTextBox = new System.Windows.Forms.TextBox();
+            this.coverTextBox = new System.Windows.Forms.TextBox();
+            this.label5 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -82,7 +86,7 @@
             // 
             // convertButton
             // 
-            this.convertButton.Location = new System.Drawing.Point(269, 544);
+            this.convertButton.Location = new System.Drawing.Point(269, 596);
             this.convertButton.Name = "convertButton";
             this.convertButton.Size = new System.Drawing.Size(75, 23);
             this.convertButton.TabIndex = 5;
@@ -216,12 +220,6 @@
             this.exitMenuItem});
             this.fileMenuItem.Text = "File";
             // 
-            // exitMenuItem
-            // 
-            this.exitMenuItem.Index = 2;
-            this.exitMenuItem.Text = "Exit";
-            this.exitMenuItem.Click += new System.EventHandler(this.exitMenuItem_Click);
-            // 
             // settingsMenuItem
             // 
             this.settingsMenuItem.Index = 0;
@@ -233,11 +231,53 @@
             this.menuItem4.Index = 1;
             this.menuItem4.Text = "-";
             // 
+            // exitMenuItem
+            // 
+            this.exitMenuItem.Index = 2;
+            this.exitMenuItem.Text = "Exit";
+            this.exitMenuItem.Click += new System.EventHandler(this.exitMenuItem_Click);
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(152, 547);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(27, 13);
+            this.label4.TabIndex = 16;
+            this.label4.Text = "Title";
+            // 
+            // titleTextBox
+            // 
+            this.titleTextBox.Location = new System.Drawing.Point(185, 544);
+            this.titleTextBox.Name = "titleTextBox";
+            this.titleTextBox.Size = new System.Drawing.Size(266, 20);
+            this.titleTextBox.TabIndex = 17;
+            // 
+            // coverTextBox
+            // 
+            this.coverTextBox.Location = new System.Drawing.Point(185, 570);
+            this.coverTextBox.Name = "coverTextBox";
+            this.coverTextBox.Size = new System.Drawing.Size(266, 20);
+            this.coverTextBox.TabIndex = 19;
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(73, 573);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(106, 13);
+            this.label5.TabIndex = 18;
+            this.label5.Text = "Cover URL (optional)";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(636, 574);
+            this.ClientSize = new System.Drawing.Size(636, 631);
+            this.Controls.Add(this.coverTextBox);
+            this.Controls.Add(this.label5);
+            this.Controls.Add(this.titleTextBox);
+            this.Controls.Add(this.label4);
             this.Controls.Add(this.chaptersListBox);
             this.Controls.Add(this.unknownListBox);
             this.Controls.Add(this.progressBar);
@@ -286,6 +326,10 @@
         private System.Windows.Forms.MenuItem exitMenuItem;
         private System.Windows.Forms.MenuItem settingsMenuItem;
         private System.Windows.Forms.MenuItem menuItem4;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.TextBox titleTextBox;
+        private System.Windows.Forms.TextBox coverTextBox;
+        private System.Windows.Forms.Label label5;
     }
 }
 
