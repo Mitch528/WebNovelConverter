@@ -107,6 +107,7 @@ namespace WebNovelConverter.Sources
                 }
                 else
                 {
+                    RemoveShare(articleNode);
                     content = articleNode.InnerHtml;
                 }
             }
@@ -161,6 +162,8 @@ namespace WebNovelConverter.Sources
                     }
                     else
                     {
+                        RemoveShare(entryNode);
+
                         var paraNodes = entryNode.SelectNodes(".//p|.//h1|.//h2|.//h3");
 
                         if (paraNodes != null)
@@ -175,6 +178,14 @@ namespace WebNovelConverter.Sources
                 Url = url,
                 Content = content
             };
+        }
+
+        protected virtual void RemoveShare(HtmlNode node)
+        {
+            var shareNodes = node.SelectNodes(".//div[contains(@class, 'sharedaddy')]");
+
+            foreach (HtmlNode toRemove in shareNodes)
+                toRemove.Remove();
         }
     }
 }
