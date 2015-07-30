@@ -35,12 +35,16 @@ namespace WebNovelConverter
                 return;
             }
 
-            chaptersListBox.Items.Clear();
-            unknownListBox.Items.Clear();
+            if (!retrieveBackgroundWorker.IsBusy)
+            {
+                chaptersListBox.Items.Clear();
+                unknownListBox.Items.Clear();
 
-            progressBar.Visible = true;
+                progressBar.Visible = true;
+                retrieveButton.Enabled = false;
 
-            retrieveBackgroundWorker.RunWorkerAsync();
+                retrieveBackgroundWorker.RunWorkerAsync();
+            }
         }
 
         private void leftButton_Click(object sender, EventArgs e)
@@ -188,6 +192,7 @@ namespace WebNovelConverter
                 }
 
                 progressBar.Visible = false;
+                retrieveButton.Enabled = true;
             });
         }
 
