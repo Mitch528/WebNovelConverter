@@ -139,14 +139,27 @@ namespace WebNovelConverter
                 {
                     WebNovelChapter chapter = await wp.GetChapterAsync(link.Url);
 
-                    writer.WriteLine(chapter.Content);
-
-                    Invoke((MethodInvoker)delegate
+                    if (chapter == null)
                     {
-                        outputTextBox.AppendText(string.Format("{0} has been processed!{1}", link.Name, Environment.NewLine));
-                        outputTextBox.SelectionStart = outputTextBox.Text.Length;
-                        outputTextBox.ScrollToCaret();
-                    });
+                        Invoke((MethodInvoker)delegate
+                        {
+                            outputTextBox.AppendText(string.Format("failed to process {0}!{1}", link.Name, Environment.NewLine));
+                            outputTextBox.SelectionStart = outputTextBox.Text.Length;
+                            outputTextBox.ScrollToCaret();
+                        });
+                    }
+                    else
+                    {
+
+                        writer.WriteLine(chapter.Content);
+
+                        Invoke((MethodInvoker)delegate
+                        {
+                            outputTextBox.AppendText(string.Format("{0} has been processed!{1}", link.Name, Environment.NewLine));
+                            outputTextBox.SelectionStart = outputTextBox.Text.Length;
+                            outputTextBox.ScrollToCaret();
+                        });
+                    }
 
                     await Task.Delay(TimeSpan.FromSeconds(Settings.Default.DelayPerChapter));
                 }
@@ -193,6 +206,13 @@ namespace WebNovelConverter
 
             Invoke((MethodInvoker)delegate
             {
+                if (links == null)
+                {
+                    MessageBox.Show("Error parsing website.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                    return;
+                }
+
                 foreach (ChapterLink link in links)
                 {
                     if (link.Unknown)

@@ -24,6 +24,9 @@ namespace WebNovelConverter.Sources
             if (entryNode == null)
                 entryNode = baseDoc.DocumentNode.SelectSingleNode("//div[contains(@class, 'post-content')]");
 
+            if (entryNode == null)
+                return null;
+
             var linkNodes = entryNode.SelectNodes(".//a");
 
             var links = new List<ChapterLink>();
@@ -93,6 +96,7 @@ namespace WebNovelConverter.Sources
             HtmlNode postNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'post')]");
             HtmlNode articleNode = doc.DocumentNode.SelectSingleNode("//article");
 
+            HtmlNode tNode = null;
             string content = string.Empty;
 
             if (articleNode != null)
@@ -113,35 +117,23 @@ namespace WebNovelConverter.Sources
             }
             else if (pageNode != null)
             {
-                HtmlNode titleNode = pageNode.SelectSingleNode(".//*[contains(@class, 'title')]");
-
-                if (titleNode == null)
-                    titleNode = pageNode.SelectSingleNode(".//*[contains(@class, 'entry-title')]");
-
-                if (titleNode != null)
-                    content = titleNode.OuterHtml;
+                tNode = pageNode.SelectSingleNode(".//*[contains(@class, 'title')]");
             }
             else if (postNode != null)
             {
-                HtmlNode titleNode = postNode.SelectSingleNode(".//*[contains(@class, 'post-title')]");
-
-                if (titleNode == null)
-                    titleNode = postNode.SelectSingleNode(".//*[contains(@class, 'entry-title')]");
-
-                if (titleNode != null)
-                    content = titleNode.OuterHtml;
+                tNode = postNode.SelectSingleNode(".//*[contains(@class, 'title')]");
             }
             else if (contentNode != null)
             {
-                HtmlNode headLineNode = contentNode.SelectSingleNode(".//*[contains(@class, 'entry-headline')]");
-
-                if (headLineNode != null)
-                    content = headLineNode.OuterHtml;
+                tNode = contentNode.SelectSingleNode(".//*[contains(@class, 'entry-headline')]");
             }
+
+            if (tNode != null)
+                content = tNode.OuterHtml;
 
             if (articleNode == null)
             {
-                HtmlNode entryNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'postbody')]");
+                HtmlNode entryNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'post-entry')]");
 
                 if (entryNode == null)
                     entryNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'entry-content')]");
@@ -150,7 +142,7 @@ namespace WebNovelConverter.Sources
                     entryNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'post-content')]");
 
                 if (entryNode == null)
-                    entryNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'post-entry')]");
+                    entryNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'postbody')]");
 
                 if (entryNode != null)
                 {
@@ -164,11 +156,7 @@ namespace WebNovelConverter.Sources
                     {
                         RemoveShare(entryNode);
 
-                        var paraNodes = entryNode.SelectNodes(".//p|.//h1|.//h2|.//h3");
-
-                        if (paraNodes != null)
-                            content += string.Join(string.Empty,
-                                    paraNodes.SelectMany(p => p.OuterHtml));
+                        content += entryNode.OuterHtml;
                     }
                 }
             }
@@ -184,8 +172,9 @@ namespace WebNovelConverter.Sources
         {
             var shareNodes = node.SelectNodes(".//div[contains(@class, 'sharedaddy')]");
 
-            foreach (HtmlNode toRemove in shareNodes)
-                toRemove.Remove();
+            if (shareNodes != null)
+                foreach (HtmlNode toRemove in shareNodes)
+                    toRemove.Remove();
         }
     }
 }
