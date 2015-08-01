@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using HtmlAgilityPack;
@@ -37,7 +38,7 @@ namespace WebNovelConverter.Sources
 
                 ChapterLink link = new ChapterLink
                 {
-                    Name = linkNode.InnerText,
+                    Name = WebUtility.HtmlDecode(linkNode.InnerText),
                     Url = linkNode.Attributes["href"].Value,
                     Unknown = true
                 };

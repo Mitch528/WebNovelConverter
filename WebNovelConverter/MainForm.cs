@@ -150,7 +150,6 @@ namespace WebNovelConverter
                     }
                     else
                     {
-
                         writer.WriteLine(chapter.Content);
 
                         Invoke((MethodInvoker)delegate
