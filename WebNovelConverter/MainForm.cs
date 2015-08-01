@@ -210,6 +210,9 @@ namespace WebNovelConverter
                 {
                     MessageBox.Show("Error parsing website.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
+                    progressBar.Visible = false;
+                    retrieveButton.Enabled = true;
+
                     return;
                 }
 
