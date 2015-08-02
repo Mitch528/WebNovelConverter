@@ -242,5 +242,26 @@ namespace WebNovelConverter
         {
             Application.Exit();
         }
+
+        private void manualChapAddButton_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(manualChapUrlTextBox.Text))
+            {
+                MessageBox.Show("Invalid url", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+
+                return;
+            }
+            
+            string chapterName = Microsoft.VisualBasic.Interaction.InputBox("Chapter Name");
+
+            if (!string.IsNullOrEmpty(chapterName))
+            {
+                chaptersListBox.Items.Add(new ChapterLink
+                {
+                    Name = chapterName,
+                    Url = manualChapUrlTextBox.Text
+                });
+            }
+        }
     }
 }

@@ -55,6 +55,9 @@
             this.titleTextBox = new System.Windows.Forms.TextBox();
             this.coverTextBox = new System.Windows.Forms.TextBox();
             this.label5 = new System.Windows.Forms.Label();
+            this.manualChapAddButton = new System.Windows.Forms.Button();
+            this.manualChapUrlTextBox = new System.Windows.Forms.TextBox();
+            this.label6 = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // label1
@@ -146,7 +149,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(96, 25);
+            this.label3.Location = new System.Drawing.Point(95, 15);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(54, 13);
             this.label3.TabIndex = 10;
@@ -154,14 +157,14 @@
             // 
             // tocUrlTextBox
             // 
-            this.tocUrlTextBox.Location = new System.Drawing.Point(156, 22);
+            this.tocUrlTextBox.Location = new System.Drawing.Point(155, 12);
             this.tocUrlTextBox.Name = "tocUrlTextBox";
             this.tocUrlTextBox.Size = new System.Drawing.Size(309, 20);
             this.tocUrlTextBox.TabIndex = 0;
             // 
             // retrieveButton
             // 
-            this.retrieveButton.Location = new System.Drawing.Point(471, 20);
+            this.retrieveButton.Location = new System.Drawing.Point(470, 10);
             this.retrieveButton.Name = "retrieveButton";
             this.retrieveButton.Size = new System.Drawing.Size(75, 23);
             this.retrieveButton.TabIndex = 1;
@@ -269,11 +272,40 @@
             this.label5.TabIndex = 18;
             this.label5.Text = "Cover URL (optional)";
             // 
+            // manualChapAddButton
+            // 
+            this.manualChapAddButton.Location = new System.Drawing.Point(470, 37);
+            this.manualChapAddButton.Name = "manualChapAddButton";
+            this.manualChapAddButton.Size = new System.Drawing.Size(75, 23);
+            this.manualChapAddButton.TabIndex = 21;
+            this.manualChapAddButton.Text = "Add";
+            this.manualChapAddButton.UseVisualStyleBackColor = true;
+            this.manualChapAddButton.Click += new System.EventHandler(this.manualChapAddButton_Click);
+            // 
+            // manualChapUrlTextBox
+            // 
+            this.manualChapUrlTextBox.Location = new System.Drawing.Point(155, 39);
+            this.manualChapUrlTextBox.Name = "manualChapUrlTextBox";
+            this.manualChapUrlTextBox.Size = new System.Drawing.Size(309, 20);
+            this.manualChapUrlTextBox.TabIndex = 20;
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(42, 42);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(107, 13);
+            this.label6.TabIndex = 22;
+            this.label6.Text = "Manual Chapter URL";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(636, 631);
+            this.Controls.Add(this.manualChapAddButton);
+            this.Controls.Add(this.manualChapUrlTextBox);
+            this.Controls.Add(this.label6);
             this.Controls.Add(this.coverTextBox);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.titleTextBox);
@@ -296,7 +328,7 @@
             this.MaximizeBox = false;
             this.Menu = this.mainMenu1;
             this.Name = "MainForm";
-            this.Text = "Web Novel Converter";
+            this.Text = "Web Novel Converter v1.0.1";
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -330,6 +362,9 @@
         private System.Windows.Forms.TextBox titleTextBox;
         private System.Windows.Forms.TextBox coverTextBox;
         private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.Button manualChapAddButton;
+        private System.Windows.Forms.TextBox manualChapUrlTextBox;
+        private System.Windows.Forms.Label label6;
     }
 }
 
