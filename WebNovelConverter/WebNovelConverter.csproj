@@ -65,6 +65,7 @@
     <Compile Include="SettingsForm.Designer.cs">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Sources\RoyalRoadL.cs" />
     <Compile Include="Sources\WebNovelSource.cs" />
     <Compile Include="Sources\WordPress.cs" />
     <Compile Include="WebNovelChapter.cs" />

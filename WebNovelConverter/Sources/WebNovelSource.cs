@@ -13,7 +13,7 @@ namespace WebNovelConverter.Sources
 
         public abstract Task<List<WebNovelChapter>> GetChaptersAsync(string url, int delayPer, IProgress<string> progress);
 
-        public abstract Task<WebNovelChapter> GetChapterAsync(string url);
+        public abstract Task<WebNovelChapter> GetChapterAsync(ChapterLink link);
 
         protected async Task<string> GetWebPage(string url)
         {
@@ -22,7 +22,9 @@ namespace WebNovelConverter.Sources
                 var resp = await client.GetAsync(url);
                 resp.EnsureSuccessStatusCode();
 
-                return await resp.Content.ReadAsStringAsync();
+                byte[] content = await resp.Content.ReadAsByteArrayAsync();
+
+                return Encoding.UTF8.GetString(content, 0, content.Length);
             }
         }
     }

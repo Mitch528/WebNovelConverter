@@ -16,6 +16,9 @@ namespace WebNovelConverter
 {
     public partial class MainForm : Form
     {
+        private readonly RoyalRoadL _royalRoad = new RoyalRoadL();
+        private readonly WordPress _wordPress = new WordPress();
+
         public MainForm()
         {
             InitializeComponent();
@@ -126,8 +129,6 @@ namespace WebNovelConverter
 
         private async void convertBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            WordPress wp = new WordPress();
-
             string tmpFile = Path.GetTempFileName();
             string newTmpFile = tmpFile + ".html";
 
@@ -137,7 +138,8 @@ namespace WebNovelConverter
             {
                 foreach (ChapterLink link in chaptersListBox.Items)
                 {
-                    WebNovelChapter chapter = await wp.GetChapterAsync(link.Url);
+                    WebNovelSource source = GetSource(link.Url);
+                    WebNovelChapter chapter = await source.GetChapterAsync(link);
 
                     if (chapter == null)
                     {
@@ -200,8 +202,8 @@ namespace WebNovelConverter
 
         private async void retrieveBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            WordPress wp = new WordPress();
-            ChapterLink[] links = await wp.GetLinks(tocUrlTextBox.Text);
+            WebNovelSource source = GetSource(tocUrlTextBox.Text);
+            ChapterLink[] links = await source.GetLinks(tocUrlTextBox.Text);
 
             Invoke((MethodInvoker)delegate
             {
@@ -251,7 +253,7 @@ namespace WebNovelConverter
 
                 return;
             }
-            
+
             string chapterName = Microsoft.VisualBasic.Interaction.InputBox("Chapter Name");
 
             if (!string.IsNullOrEmpty(chapterName))
@@ -262,6 +264,24 @@ namespace WebNovelConverter
                     Url = manualChapUrlTextBox.Text
                 });
             }
+        }
+
+        private WebNovelSource GetSource(string url)
+        {
+            string domain = new Uri(tocUrlTextBox.Text).GetLeftPart(UriPartial.Authority).Replace("/www.", "/").Replace("http://", "");
+
+            WebNovelSource source;
+            switch (domain.ToLower())
+            {
+                case "royalroadl.com":
+                    source = _royalRoad;
+                    break;
+                default:
+                    source =  _wordPress;
+                    break;
+            }
+
+            return source;
         }
     }
 }

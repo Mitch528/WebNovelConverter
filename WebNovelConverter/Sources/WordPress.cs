@@ -62,7 +62,7 @@ namespace WebNovelConverter.Sources
             {
                 try
                 {
-                    WebNovelChapter chapter = await GetChapterAsync(link.Url);
+                    WebNovelChapter chapter = await GetChapterAsync(link);
                     chapter.ChapterId = ctr;
 
                     chapters.Add(chapter);
@@ -85,9 +85,9 @@ namespace WebNovelConverter.Sources
             return chapters;
         }
 
-        public override async Task<WebNovelChapter> GetChapterAsync(string url)
+        public override async Task<WebNovelChapter> GetChapterAsync(ChapterLink link)
         {
-            string pageContent = await GetWebPage(url);
+            string pageContent = await GetWebPage(link.Url);
 
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(pageContent);
@@ -164,7 +164,7 @@ namespace WebNovelConverter.Sources
 
             return new WebNovelChapter
             {
-                Url = url,
+                Url = link.Url,
                 Content = content
             };
         }
