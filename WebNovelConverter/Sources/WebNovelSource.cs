@@ -13,6 +13,8 @@ namespace WebNovelConverter.Sources
         
         public abstract Task<WebNovelChapter> GetChapterAsync(ChapterLink link);
 
+        public abstract Task<string> GetNovelCover(string baseUrl);
+
         protected async Task<string> GetWebPage(string url)
         {
             using (HttpClient client = new HttpClient())

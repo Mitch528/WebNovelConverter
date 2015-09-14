@@ -202,6 +202,9 @@ namespace WebNovelConverter
         private async void retrieveBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             WebNovelSource source = GetSource(tocUrlTextBox.Text);
+            string coverUrl = await source.GetNovelCover(tocUrlTextBox.Text);
+            coverUrl = coverUrl.StartsWith("//") ? coverUrl.Substring(2) : coverUrl;
+
             ChapterLink[] links = await source.GetLinks(tocUrlTextBox.Text);
 
             Invoke((MethodInvoker)delegate
@@ -227,6 +230,9 @@ namespace WebNovelConverter
                         chaptersListBox.Items.Add(link);
                     }
                 }
+
+                if (!string.IsNullOrEmpty(coverUrl))
+                    coverTextBox.Text = new UriBuilder(coverUrl).Uri.AbsoluteUri;
 
                 progressBar.Visible = false;
                 retrieveButton.Enabled = true;

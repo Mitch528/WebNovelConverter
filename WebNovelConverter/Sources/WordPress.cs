@@ -26,6 +26,9 @@ namespace WebNovelConverter.Sources
                 entryNode = baseDoc.DocumentNode.SelectSingleNode("//div[contains(@class, 'post-content')]");
 
             if (entryNode == null)
+                entryNode = baseDoc.DocumentNode.SelectSingleNode("//div[contains(@class, 'the-content')]");
+
+            if (entryNode == null)
                 return null;
 
             var linkNodes = entryNode.SelectNodes(".//a");
@@ -134,6 +137,11 @@ namespace WebNovelConverter.Sources
                 Url = link.Url,
                 Content = content
             };
+        }
+
+        public override Task<string> GetNovelCover(string baseUrl)
+        {
+            return Task.FromResult(string.Empty);
         }
 
         protected virtual void RemoveShare(HtmlNode node)

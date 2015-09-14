@@ -59,7 +59,17 @@ namespace WebNovelConverter.Sources
             };
         }
 
-        private void RemoveNonTables(HtmlNode rootNode)
+        public override async Task<string> GetNovelCover(string baseUrl)
+        {
+            string baseContent = await GetWebPage(baseUrl);
+
+            HtmlDocument baseDoc = new HtmlDocument();
+            baseDoc.LoadHtml(baseContent);
+
+            return baseDoc.GetElementbyId("fiction-header")?.SelectSingleNode("img").Attributes["src"].Value;
+        }
+
+        protected virtual void RemoveNonTables(HtmlNode rootNode)
         {
             var nodes = rootNode.SelectNodes(".//div");
 
