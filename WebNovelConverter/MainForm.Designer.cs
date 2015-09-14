@@ -325,7 +325,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(954, 933);
+            this.ClientSize = new System.Drawing.Size(954, 958);
             this.Controls.Add(this.manualChapAddButton);
             this.Controls.Add(this.manualChapUrlTextBox);
             this.Controls.Add(this.label6);
