@@ -38,29 +38,32 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(28, 33);
+            this.label1.Location = new System.Drawing.Point(42, 51);
+            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(151, 13);
+            this.label1.Size = new System.Drawing.Size(224, 20);
             this.label1.TabIndex = 0;
             this.label1.Text = "Delay per chapter (in seconds)";
             // 
             // delayNumericUpDown
             // 
-            this.delayNumericUpDown.Location = new System.Drawing.Point(185, 31);
+            this.delayNumericUpDown.Location = new System.Drawing.Point(278, 48);
+            this.delayNumericUpDown.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.delayNumericUpDown.Maximum = new decimal(new int[] {
             9999999,
             0,
             0,
             0});
             this.delayNumericUpDown.Name = "delayNumericUpDown";
-            this.delayNumericUpDown.Size = new System.Drawing.Size(56, 20);
+            this.delayNumericUpDown.Size = new System.Drawing.Size(84, 26);
             this.delayNumericUpDown.TabIndex = 1;
             // 
             // saveButton
             // 
-            this.saveButton.Location = new System.Drawing.Point(185, 131);
+            this.saveButton.Location = new System.Drawing.Point(278, 202);
+            this.saveButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.saveButton.Name = "saveButton";
-            this.saveButton.Size = new System.Drawing.Size(75, 23);
+            this.saveButton.Size = new System.Drawing.Size(112, 35);
             this.saveButton.TabIndex = 2;
             this.saveButton.Text = "Save";
             this.saveButton.UseVisualStyleBackColor = true;
@@ -68,9 +71,10 @@
             // 
             // cancelButton
             // 
-            this.cancelButton.Location = new System.Drawing.Point(12, 131);
+            this.cancelButton.Location = new System.Drawing.Point(18, 202);
+            this.cancelButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.cancelButton.Name = "cancelButton";
-            this.cancelButton.Size = new System.Drawing.Size(75, 23);
+            this.cancelButton.Size = new System.Drawing.Size(112, 35);
             this.cancelButton.TabIndex = 3;
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
@@ -78,14 +82,17 @@
             // 
             // SettingsForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AcceptButton = this.saveButton;
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(272, 166);
+            this.CancelButton = this.cancelButton;
+            this.ClientSize = new System.Drawing.Size(408, 255);
             this.Controls.Add(this.cancelButton);
             this.Controls.Add(this.saveButton);
             this.Controls.Add(this.delayNumericUpDown);
             this.Controls.Add(this.label1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.MaximizeBox = false;
             this.Name = "SettingsForm";
             this.Text = "Settings";

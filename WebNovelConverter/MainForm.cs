@@ -26,7 +26,6 @@ namespace WebNovelConverter
 
         private void MainForm_Load(object sender, EventArgs e)
         {
-            Settings.Default.Upgrade();
         }
 
         private void retrieveButton_Click(object sender, EventArgs e)
@@ -268,7 +267,7 @@ namespace WebNovelConverter
 
         private WebNovelSource GetSource(string url)
         {
-            string domain = new Uri(tocUrlTextBox.Text).GetLeftPart(UriPartial.Authority).Replace("/www.", "/").Replace("http://", "");
+            string domain = new Uri(url).GetLeftPart(UriPartial.Authority).Replace("/www.", "/").Replace("http://", "");
 
             WebNovelSource source;
             switch (domain.ToLower())
@@ -277,7 +276,7 @@ namespace WebNovelConverter
                     source = _royalRoad;
                     break;
                 default:
-                    source =  _wordPress;
+                    source = _wordPress;
                     break;
             }
 

@@ -22,7 +22,7 @@ namespace WebNovelConverter.Sources
             foreach (HtmlNode chapterNode in chapterNodes)
             {
                 HtmlNode linkNode = chapterNode.SelectSingleNode(".//a");
-                
+
                 string title = linkNode.Attributes["title"].Value;
 
                 ChapterLink link = new ChapterLink
@@ -38,11 +38,6 @@ namespace WebNovelConverter.Sources
             return links.ToArray();
         }
 
-        public override Task<List<WebNovelChapter>> GetChaptersAsync(string url, int delayPer, IProgress<string> progress)
-        {
-            return null;
-        }
-
         public override async Task<WebNovelChapter> GetChapterAsync(ChapterLink link)
         {
             string pageContent = await GetWebPage(link.Url);
@@ -50,13 +45,11 @@ namespace WebNovelConverter.Sources
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(pageContent);
 
-            var postsNode = doc.GetElementbyId("posts");
-            var postNodes = postsNode.SelectNodes(".//div[contains(@class, 'post_body')]");
-            HtmlNode firstPostNode = postNodes.First();
+            HtmlNode firstPostNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'post_body')]");
 
-            RemoveNav(firstPostNode);
+            RemoveNonTables(firstPostNode);
 
-            string content = string.Format("<h1>{0}</h1>", link.Name);
+            string content = $"<h1 class='chapter'>{link.Name}</h1>";
             content += firstPostNode.InnerHtml;
 
             return new WebNovelChapter
@@ -66,11 +59,25 @@ namespace WebNovelConverter.Sources
             };
         }
 
-        private void RemoveNav(HtmlNode node)
+        private void RemoveNonTables(HtmlNode rootNode)
         {
-            var divNodes = node.SelectNodes("div");
+            var nodes = rootNode.SelectNodes(".//div");
 
-            divNodes.Last().Remove();
+            if (nodes == null)
+                return;
+
+            foreach (HtmlNode node in nodes.ToList())
+            {
+                var tableNodes = node.SelectNodes(".//table");
+
+                if (tableNodes == null || !tableNodes.Any())
+                {
+                    node.Remove();
+                    nodes.Remove(node);
+                }
+            }
+            
+            nodes.Last().Remove();
         }
     }
 }

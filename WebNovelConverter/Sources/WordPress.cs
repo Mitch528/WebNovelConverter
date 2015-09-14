@@ -52,39 +52,6 @@ namespace WebNovelConverter.Sources
             return links.ToArray();
         }
 
-        public override async Task<List<WebNovelChapter>> GetChaptersAsync(string baseUrl, int delayPer, IProgress<string> progress)
-        {
-            ChapterLink[] links = await GetLinks(baseUrl);
-            var chapters = new List<WebNovelChapter>();
-
-            int ctr = 1;
-            foreach (ChapterLink link in links)
-            {
-                try
-                {
-                    WebNovelChapter chapter = await GetChapterAsync(link);
-                    chapter.ChapterId = ctr;
-
-                    chapters.Add(chapter);
-
-                    progress.Report(string.Format("{0} has been processed ({1})", link.Name, ctr));
-                }
-                catch (Exception ex)
-                {
-                    progress.Report(string.Format("Error processing {0}", link.Name));
-                    progress.Report(ex.ToString());
-                }
-
-                ctr++;
-
-                await Task.Delay(delayPer);
-            }
-
-            progress.Report("Finished processing chapters!");
-
-            return chapters;
-        }
-
         public override async Task<WebNovelChapter> GetChapterAsync(ChapterLink link)
         {
             string pageContent = await GetWebPage(link.Url);
