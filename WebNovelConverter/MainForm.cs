@@ -16,8 +16,9 @@ namespace WebNovelConverter
 {
     public partial class MainForm : Form
     {
-        private readonly RoyalRoadL _royalRoad = new RoyalRoadL();
-        private readonly WordPress _wordPress = new WordPress();
+        private readonly WordPress _wordpress = new WordPress();
+
+        private readonly NovelSourceCollection _sources = new NovelSourceCollection();
 
         public MainForm()
         {
@@ -26,6 +27,8 @@ namespace WebNovelConverter
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            _sources.Add(new RoyalRoadL());
+            _sources.Add(new BakaTsuki());
         }
 
         private void retrieveButton_Click(object sender, EventArgs e)
@@ -41,6 +44,9 @@ namespace WebNovelConverter
             {
                 chaptersListBox.Items.Clear();
                 unknownListBox.Items.Clear();
+
+                titleTextBox.Text = string.Empty;
+                coverTextBox.Text = string.Empty;
 
                 progressBar.Visible = true;
                 retrieveButton.Enabled = false;
@@ -201,11 +207,13 @@ namespace WebNovelConverter
 
         private async void retrieveBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            WebNovelSource source = GetSource(tocUrlTextBox.Text);
-            string coverUrl = await source.GetNovelCover(tocUrlTextBox.Text);
+            string tocUrl = tocUrlTextBox.Text;
+
+            WebNovelSource source = GetSource(tocUrl);
+            string coverUrl = await source.GetNovelCover(tocUrl);
             coverUrl = coverUrl.StartsWith("//") ? coverUrl.Substring(2) : coverUrl;
 
-            ChapterLink[] links = await source.GetLinks(tocUrlTextBox.Text);
+            ChapterLink[] links = await source.GetLinks(tocUrl);
 
             Invoke((MethodInvoker)delegate
             {
@@ -273,20 +281,7 @@ namespace WebNovelConverter
 
         private WebNovelSource GetSource(string url)
         {
-            string domain = new Uri(url).GetLeftPart(UriPartial.Authority).Replace("/www.", "/").Replace("http://", "");
-
-            WebNovelSource source;
-            switch (domain.ToLower())
-            {
-                case "royalroadl.com":
-                    source = _royalRoad;
-                    break;
-                default:
-                    source = _wordPress;
-                    break;
-            }
-
-            return source;
+            return _sources.Get(url) ?? _wordpress;
         }
     }
 }

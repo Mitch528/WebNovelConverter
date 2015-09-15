@@ -9,6 +9,8 @@ namespace WebNovelConverter.Sources
 {
     public abstract class WebNovelSource
     {
+        public abstract string BaseUrl { get; }
+
         public abstract Task<ChapterLink[]> GetLinks(string baseUrl);
         
         public abstract Task<WebNovelChapter> GetChapterAsync(ChapterLink link);
@@ -19,7 +21,9 @@ namespace WebNovelConverter.Sources
         {
             using (HttpClient client = new HttpClient())
             {
-                var resp = await client.GetAsync(url);
+                UriBuilder uriBuilder = new UriBuilder(url);
+
+                var resp = await client.GetAsync(uriBuilder.Uri);
                 resp.EnsureSuccessStatusCode();
 
                 byte[] content = await resp.Content.ReadAsByteArrayAsync();

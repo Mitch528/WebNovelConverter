@@ -68,6 +68,8 @@
     <Compile Include="SettingsForm.Designer.cs">
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Sources\BakaTsuki.cs" />
+    <Compile Include="Sources\NovelSourceCollection.cs" />
     <Compile Include="Sources\RoyalRoadL.cs" />
     <Compile Include="Sources\WebNovelSource.cs" />
     <Compile Include="Sources\WordPress.cs" />
@@ -100,7 +102,9 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

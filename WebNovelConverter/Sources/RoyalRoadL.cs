@@ -9,6 +9,8 @@ namespace WebNovelConverter.Sources
 {
     public class RoyalRoadL : WebNovelSource
     {
+        public override string BaseUrl => "http://royalroadl.com/";
+
         public override async Task<ChapterLink[]> GetLinks(string baseUrl)
         {
             string baseContent = await GetWebPage(baseUrl);

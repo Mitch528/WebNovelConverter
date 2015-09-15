@@ -10,6 +10,8 @@ namespace WebNovelConverter.Sources
 {
     public class WordPress : WebNovelSource
     {
+        public override string BaseUrl => null;
+
         public override async Task<ChapterLink[]> GetLinks(string baseUrl)
         {
             string baseContent = await GetWebPage(baseUrl);
