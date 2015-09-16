@@ -9,6 +9,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Epub.Net;
+using Epub.Net.Models;
 using WebNovelConverter.Properties;
 using WebNovelConverter.Sources;
 
@@ -134,70 +136,37 @@ namespace WebNovelConverter
 
         private async void convertBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            string tmpFile = Path.GetTempFileName();
-            string newTmpFile = tmpFile + ".html";
-
-            File.Move(tmpFile, newTmpFile);
-
-            using (StreamWriter writer = new StreamWriter(newTmpFile))
+            EBook book = new EBook
             {
-                foreach (ChapterLink link in chaptersListBox.Items)
+                Title = titleTextBox.Text,
+                CoverImage = coverTextBox.Text
+            };
+
+            foreach (ChapterLink link in chaptersListBox.Items)
+            {
+                WebNovelSource source = GetSource(link.Url);
+                WebNovelChapter chapter = await source.GetChapterAsync(link);
+
+                if (chapter == null)
                 {
-                    WebNovelSource source = GetSource(link.Url);
-                    WebNovelChapter chapter = await source.GetChapterAsync(link);
-
-                    if (chapter == null)
-                    {
-                        Invoke((MethodInvoker)delegate
-                        {
-                            outputTextBox.AppendText(string.Format("failed to process {0}!{1}", link.Name, Environment.NewLine));
-                            outputTextBox.SelectionStart = outputTextBox.Text.Length;
-                            outputTextBox.ScrollToCaret();
-                        });
-                    }
-                    else
-                    {
-                        writer.WriteLine(chapter.Content);
-
-                        Invoke((MethodInvoker)delegate
-                        {
-                            outputTextBox.AppendText(string.Format("{0} has been processed!{1}", link.Name, Environment.NewLine));
-                            outputTextBox.SelectionStart = outputTextBox.Text.Length;
-                            outputTextBox.ScrollToCaret();
-                        });
-                    }
-
-                    await Task.Delay(TimeSpan.FromSeconds(Settings.Default.DelayPerChapter));
+                    WriteText($"Failed to process {link.Name}!", Color.Red);
                 }
+                else
+                {
+                    book.Chapters.Add(new Chapter { Name = link.Name, Content = chapter.Content });
+
+                    WriteText($"{link.Name} has been processed.", Color.Green);
+                }
+
+                await Task.Delay(TimeSpan.FromSeconds(Settings.Default.DelayPerChapter));
             }
 
-            string ebookConvert = Path.Combine("Calibre Portable", "Calibre", "ebook-convert.exe");
+            WriteText("Generating epub...");
 
-            StringBuilder argsBuilder = new StringBuilder(string.Format("\"{0}\" \"{1}\" ", newTmpFile, e.Argument));
+            book.GenerateEpub(e.Argument.ToString());
 
-            Invoke((MethodInvoker)delegate
-            {
-                if (!string.IsNullOrEmpty(titleTextBox.Text))
-                {
-                    argsBuilder.AppendFormat("--title \"{0}\" ", titleTextBox.Text);
-                }
-
-                if (!string.IsNullOrEmpty(coverTextBox.Text))
-                {
-                    argsBuilder.AppendFormat("--cover \"{0}\"", coverTextBox.Text);
-                }
-            });
-
-            ProcessStartInfo psi = new ProcessStartInfo(ebookConvert, argsBuilder.ToString());
-
-            Process proc = new Process();
-            proc.StartInfo = psi;
-
-            proc.Start();
-            proc.WaitForExit();
-
-            File.Delete(newTmpFile);
-
+            WriteText("Done!");
+            
             Invoke((MethodInvoker)delegate
             {
                 progressBar.Visible = false;
@@ -282,6 +251,32 @@ namespace WebNovelConverter
         private WebNovelSource GetSource(string url)
         {
             return _sources.Get(url) ?? _wordpress;
+        }
+
+        private void WriteText(string text)
+        {
+            Invoke((MethodInvoker)delegate
+            {
+                outputTextBox.AppendText(text + Environment.NewLine);
+                outputTextBox.SelectionStart = outputTextBox.Text.Length;
+                outputTextBox.ScrollToCaret();
+            });
+        }
+
+        public void WriteText(string text, Color color)
+        {
+            Invoke((MethodInvoker)delegate
+            {
+                outputTextBox.SelectionStart = outputTextBox.TextLength;
+                outputTextBox.SelectionLength = 0;
+
+                outputTextBox.SelectionColor = color;
+                outputTextBox.AppendText(text + Environment.NewLine);
+                outputTextBox.SelectionColor = outputTextBox.ForeColor;
+
+                outputTextBox.SelectionStart = outputTextBox.Text.Length;
+                outputTextBox.ScrollToCaret();
+            });
         }
     }
 }

@@ -104,7 +104,7 @@
             // saveFileDialog
             // 
             this.saveFileDialog.DefaultExt = "epub";
-            this.saveFileDialog.Filter = "epub|*.epub|pdf|.pdf";
+            this.saveFileDialog.Filter = "epub|*.epub";
             // 
             // upButton
             // 
@@ -352,7 +352,7 @@
             this.MaximizeBox = false;
             this.Menu = this.mainMenu1;
             this.Name = "MainForm";
-            this.Text = "Web Novel Converter v1.1.0";
+            this.Text = "Web Novel Converter v1.2.0";
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

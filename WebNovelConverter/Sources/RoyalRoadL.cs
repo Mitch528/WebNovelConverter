@@ -50,14 +50,11 @@ namespace WebNovelConverter.Sources
             HtmlNode firstPostNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'post_body')]");
 
             RemoveNonTables(firstPostNode);
-
-            string content = $"<h1 class='chapter'>{link.Name}</h1>";
-            content += firstPostNode.InnerHtml;
-
+            
             return new WebNovelChapter
             {
                 Url = link.Url,
-                Content = content
+                Content = firstPostNode.InnerHtml
             };
         }
 

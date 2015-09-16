@@ -64,14 +64,9 @@ namespace WebNovelConverter.Sources
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(pageContent);
 
-            HtmlNode contentNode = doc.GetElementbyId("content");
-            HtmlNode pageNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'page')]");
-            HtmlNode postNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'post')]");
             HtmlNode articleNode = doc.DocumentNode.SelectSingleNode("//article");
 
-            HtmlNode tNode = null;
             string content = string.Empty;
-
             if (articleNode != null)
             {
                 HtmlNode ifNode = articleNode.SelectSingleNode(".//iframe");
@@ -84,53 +79,35 @@ namespace WebNovelConverter.Sources
                 }
                 else
                 {
-                    RemoveShare(articleNode);
+                    RemoveBloat(articleNode);
                     content = articleNode.InnerHtml;
                 }
             }
-            else if (pageNode != null)
+
+            HtmlNode entryNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'post-entry')]");
+
+            if (entryNode == null)
+                entryNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'entry-content')]");
+
+            if (entryNode == null)
+                entryNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'post-content')]");
+
+            if (entryNode == null)
+                entryNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'postbody')]");
+
+            if (entryNode != null)
             {
-                tNode = pageNode.SelectSingleNode(".//*[contains(@class, 'title')]");
-            }
-            else if (postNode != null)
-            {
-                tNode = postNode.SelectSingleNode(".//*[contains(@class, 'title')]");
-            }
-            else if (contentNode != null)
-            {
-                tNode = contentNode.SelectSingleNode(".//*[contains(@class, 'entry-headline')]");
-            }
+                HtmlNode ifNode = entryNode.SelectSingleNode(".//iframe");
 
-            if (tNode != null)
-                content = tNode.OuterHtml;
-
-            if (articleNode == null)
-            {
-                HtmlNode entryNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'post-entry')]");
-
-                if (entryNode == null)
-                    entryNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'entry-content')]");
-
-                if (entryNode == null)
-                    entryNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'post-content')]");
-
-                if (entryNode == null)
-                    entryNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'postbody')]");
-
-                if (entryNode != null)
+                if (ifNode != null)
                 {
-                    HtmlNode ifNode = entryNode.SelectSingleNode(".//iframe");
+                    content = ifNode.InnerHtml;
+                }
+                else
+                {
+                    RemoveBloat(entryNode);
 
-                    if (ifNode != null)
-                    {
-                        content = ifNode.InnerHtml;
-                    }
-                    else
-                    {
-                        RemoveShare(entryNode);
-
-                        content += entryNode.OuterHtml;
-                    }
+                    content = entryNode.OuterHtml;
                 }
             }
 
@@ -146,9 +123,10 @@ namespace WebNovelConverter.Sources
             return Task.FromResult(string.Empty);
         }
 
-        protected virtual void RemoveShare(HtmlNode node)
+        protected virtual void RemoveBloat(HtmlNode node)
         {
-            var shareNodes = node.SelectNodes(".//div[contains(@class, 'sharedaddy')]");
+            var shareNodes = node.SelectNodes(@".//div[contains(@class, 'sharedaddy')]|.//div[contains(@class, 'share-story-container')]
+|.//div[contains(@class, 'code-block')]|.//div[contains(@class, 'comments-area')]");
 
             if (shareNodes != null)
                 foreach (HtmlNode toRemove in shareNodes)

@@ -85,6 +85,8 @@ namespace WebNovelConverter.Sources
             if (contentNode == null)
                 return null;
 
+            baseDoc.GetElementbyId("toc")?.Remove();
+
             foreach (HtmlNode linkNode in contentNode.SelectNodes(".//a"))
             {
                 linkNode.SetAttributeValue("href", GetAbsoluteUrl(BaseUrl, WebUtility.HtmlDecode(linkNode.Attributes["href"].Value)));
@@ -110,14 +112,11 @@ namespace WebNovelConverter.Sources
                 }
             }
 
-            string content = $"<h1 class='chapter'>{link.Name}</h1>";
-            content += contentNode.InnerHtml;
-
             return new WebNovelChapter
             {
                 Url = link.Url,
-                Content = content
-            };
+                Content = contentNode.InnerHtml
+        };
         }
 
         private static string GetAbsoluteUrl(string baseUrl, string url)
