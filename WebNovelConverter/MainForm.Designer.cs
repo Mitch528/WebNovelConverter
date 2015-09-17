@@ -325,7 +325,8 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(954, 958);
+            this.AutoSize = true;
+            this.ClientSize = new System.Drawing.Size(954, 956);
             this.Controls.Add(this.manualChapAddButton);
             this.Controls.Add(this.manualChapUrlTextBox);
             this.Controls.Add(this.label6);
@@ -352,7 +353,7 @@
             this.MaximizeBox = false;
             this.Menu = this.mainMenu1;
             this.Name = "MainForm";
-            this.Text = "Web Novel Converter v1.2.0";
+            this.Text = "Web Novel Converter v1.2.1";
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
