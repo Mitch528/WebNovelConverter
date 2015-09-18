@@ -42,7 +42,6 @@ namespace WebNovelConverter.Sources
             if (possibleChapters == null)
                 return new ChapterLink[0];
 
-
             var links = new List<ChapterLink>();
 
             foreach (HtmlNode possibleChapter in possibleChapters)
@@ -95,6 +94,9 @@ namespace WebNovelConverter.Sources
 
                 if (imgNode != null)
                 {
+                    foreach (var attrib in imgNode.Attributes.Where(p => p.Name != "width" && p.Name != "height").ToList())
+                        attrib.Remove();
+
                     string linkImgUrl = linkNode.Attributes["href"].Value;
                     string imgPageContent = await GetWebPage(linkImgUrl);
 
@@ -116,7 +118,7 @@ namespace WebNovelConverter.Sources
             {
                 Url = link.Url,
                 Content = contentNode.InnerHtml
-        };
+            };
         }
 
         private static string GetAbsoluteUrl(string baseUrl, string url)
