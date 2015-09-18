@@ -94,7 +94,7 @@ namespace WebNovelConverter.Sources
 
                 if (imgNode != null)
                 {
-                    foreach (var attrib in imgNode.Attributes.Where(p => p.Name != "width" && p.Name != "height").ToList())
+                    foreach (HtmlAttribute attrib in imgNode.Attributes.Where(p => p.Name != "width" && p.Name != "height").ToList())
                         attrib.Remove();
 
                     string linkImgUrl = linkNode.Attributes["href"].Value;

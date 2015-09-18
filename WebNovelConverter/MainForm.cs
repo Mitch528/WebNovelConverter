@@ -141,7 +141,7 @@ namespace WebNovelConverter
                 Title = titleTextBox.Text,
                 CoverImage = coverTextBox.Text
             };
-
+            
             foreach (ChapterLink link in chaptersListBox.Items)
             {
                 WebNovelSource source = GetSource(link.Url);
@@ -163,7 +163,7 @@ namespace WebNovelConverter
 
             WriteText("Generating epub...");
 
-            book.GenerateEpub(e.Argument.ToString());
+            await book.GenerateEpubAsync(e.Argument.ToString());
 
             WriteText("Done!");
             
