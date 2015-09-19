@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Epub.Net;
+using Epub.Net.Extensions;
 using Epub.Net.Models;
 using WebNovelConverter.Properties;
 using WebNovelConverter.Sources;
@@ -120,6 +121,9 @@ namespace WebNovelConverter
 
         private void convertButton_Click(object sender, EventArgs e)
         {
+            if (!string.IsNullOrEmpty(titleTextBox.Text))
+                saveFileDialog.FileName = $"{titleTextBox.Text.ToValidFilePath()}.epub";
+
             DialogResult saveResult = saveFileDialog.ShowDialog();
 
             if (saveResult == DialogResult.OK && !convertBackgroundWorker.IsBusy)
@@ -141,7 +145,7 @@ namespace WebNovelConverter
                 Title = titleTextBox.Text,
                 CoverImage = coverTextBox.Text
             };
-            
+
             foreach (ChapterLink link in chaptersListBox.Items)
             {
                 WebNovelSource source = GetSource(link.Url);
@@ -166,7 +170,7 @@ namespace WebNovelConverter
             await book.GenerateEpubAsync(e.Argument.ToString());
 
             WriteText("Done!");
-            
+
             Invoke((MethodInvoker)delegate
             {
                 progressBar.Visible = false;
