@@ -70,22 +70,20 @@ namespace WebNovelConverter.Sources
 
         protected virtual void RemoveNonTables(HtmlNode rootNode)
         {
-            var nodes = rootNode.SelectNodes(".//div");
-
-            if (nodes == null)
-                return;
-
-            foreach (HtmlNode node in nodes.ToList())
-            {
-                var tableNodes = node.SelectNodes(".//table");
-
-                if (tableNodes == null || !tableNodes.Any())
-                {
-                    node.Remove();
-                    nodes.Remove(node);
-                }
-            }
+            var nodes = rootNode.Descendants("div").ToList();
             
+            HtmlNode currentNode = nodes.FirstOrDefault();
+            while (currentNode != null)
+            {
+                if (!currentNode.Descendants("table").Any())
+                {
+                    currentNode.Remove();
+                    nodes.Remove(currentNode);
+                }
+                
+                currentNode = currentNode.NextSibling;
+            }
+
             nodes.Last().Remove();
         }
     }
