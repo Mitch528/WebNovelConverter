@@ -41,10 +41,15 @@ namespace WebNovelConverter.Sources
                 if (string.IsNullOrWhiteSpace(linkNode.InnerText))
                     continue;
 
+                string url = UrlHelper.ToAbsoluteUrl(baseUrl, linkNode.Attributes["href"].Value);
+
+                if (string.IsNullOrEmpty(url))
+                    continue;
+
                 ChapterLink link = new ChapterLink
                 {
                     Name = WebUtility.HtmlDecode(linkNode.InnerText),
-                    Url = linkNode.Attributes["href"].Value,
+                    Url = url,
                     Unknown = true
                 };
 

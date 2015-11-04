@@ -89,6 +89,7 @@
     <Compile Include="Sources\RoyalRoadL.cs" />
     <Compile Include="Sources\WebNovelSource.cs" />
     <Compile Include="Sources\WordPress.cs" />
+    <Compile Include="UrlHelper.cs" />
     <Compile Include="WebNovelChapter.cs" />
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
