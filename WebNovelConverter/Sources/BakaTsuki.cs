@@ -98,6 +98,8 @@ namespace WebNovelConverter.Sources
 
             doc.GetElementById("toc")?.Remove();
 
+            RemoveTables(contentElement);
+
             foreach (IElement linkElement in contentElement.Descendents<IElement>().Where(p => p.LocalName == "a"))
             {
                 if (!linkElement.HasAttribute("href"))
@@ -141,6 +143,11 @@ namespace WebNovelConverter.Sources
                 Url = link.Url,
                 Content = contentElement.InnerHtml
             };
+        }
+
+        protected virtual void RemoveTables(IElement element)
+        {
+            element.Descendents<IElement>().Where(p => p.LocalName == "table").ToList().ForEach(p => p.Remove());
         }
     }
 }
