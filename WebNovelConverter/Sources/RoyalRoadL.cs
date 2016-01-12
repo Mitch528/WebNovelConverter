@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using HtmlAgilityPack;
+using AngleSharp.Dom;
+using AngleSharp.Dom.Html;
+using AngleSharp.Extensions;
 
 namespace WebNovelConverter.Sources
 {
@@ -11,80 +14,100 @@ namespace WebNovelConverter.Sources
     {
         public override string BaseUrl => "http://royalroadl.com/";
 
-        public override async Task<ChapterLink[]> GetLinks(string baseUrl)
+        public RoyalRoadL() : base("RoyalRoadL")
         {
-            string baseContent = await GetWebPage(baseUrl);
+        }
 
-            HtmlDocument baseDoc = new HtmlDocument();
-            baseDoc.LoadHtml(baseContent);
+        public override async Task<IEnumerable<ChapterLink>> GetChapterLinksAsync(string baseUrl, CancellationToken token = default(CancellationToken))
+        {
+            string baseContent = await GetWebPageAsync(baseUrl, token);
 
-            var chapterNodes = baseDoc.DocumentNode.SelectNodes("//li[@class='chapter']");
+            IHtmlDocument doc = await Parser.ParseAsync(baseContent, token);
 
-            var links = new List<ChapterLink>();
-            foreach (HtmlNode chapterNode in chapterNodes)
+            var chapterElements = from element in doc.All
+                                  where element.LocalName == "li"
+                                  where element.HasAttribute("class")
+                                  let classAttrib = element.GetAttribute("class")
+                                  where classAttrib.Contains("chapter")
+                                  select element;
+
+            return CollectChapterLinks(baseUrl, chapterElements);
+        }
+
+        protected override IEnumerable<ChapterLink> CollectChapterLinks(string baseUrl, IEnumerable<IElement> linkElements, Func<IElement, bool> linkFilter = null)
+        {
+            foreach (IElement chapterElement in linkElements)
             {
-                HtmlNode linkNode = chapterNode.SelectSingleNode(".//a");
+                IElement linkElement = chapterElement.Descendents<IElement>().FirstOrDefault(p => p.LocalName == "a");
 
-                string title = linkNode.Attributes["title"].Value;
+                if (linkElement == null || !linkElement.HasAttribute("title") || !linkElement.HasAttribute("href"))
+                    continue;
+
+                string title = linkElement.GetAttribute("title");
 
                 ChapterLink link = new ChapterLink
                 {
                     Name = title,
-                    Url = linkNode.Attributes["href"].Value,
+                    Url = linkElement.GetAttribute("href"),
                     Unknown = false
                 };
 
-                links.Add(link);
+                yield return link;
             }
-
-            return links.ToArray();
         }
 
-        public override async Task<WebNovelChapter> GetChapterAsync(ChapterLink link)
+        public override async Task<WebNovelChapter> GetChapterAsync(ChapterLink link, CancellationToken token = default(CancellationToken))
         {
-            string pageContent = await GetWebPage(link.Url);
-
-            HtmlDocument doc = new HtmlDocument();
-            doc.LoadHtml(pageContent);
-
-            HtmlNode firstPostNode = doc.DocumentNode.SelectSingleNode("//div[contains(@class, 'post_body')]");
-
-            RemoveNonTables(firstPostNode);
+            string pageContent = await GetWebPageAsync(link.Url, token);
             
+            IHtmlDocument doc = await Parser.ParseAsync(pageContent, token);
+            
+            IElement firstPostElement = (from e in doc.All
+                                        where e.LocalName == "div"
+                                        where e.HasAttribute("class")
+                                        let classAttribute = e.GetAttribute("class")
+                                        where classAttribute.Contains("post_body")
+                                        select e).FirstOrDefault();
+
+            if (firstPostElement == null)
+                return null;
+            
+            RemoveNonTables(firstPostElement);
+
             return new WebNovelChapter
             {
                 Url = link.Url,
-                Content = firstPostNode.InnerHtml
+                Content = firstPostElement.InnerHtml
             };
         }
 
-        public override async Task<string> GetNovelCover(string baseUrl)
+        public override async Task<string> GetNovelCoverAsync(string baseUrl, CancellationToken token = default(CancellationToken))
         {
-            string baseContent = await GetWebPage(baseUrl);
+            string baseContent = await GetWebPageAsync(baseUrl, token);
 
-            HtmlDocument baseDoc = new HtmlDocument();
-            baseDoc.LoadHtml(baseContent);
+            IHtmlDocument doc = await Parser.ParseAsync(baseContent, token);
 
-            return baseDoc.GetElementbyId("fiction-header")?.SelectSingleNode("img").Attributes["src"].Value;
+            return doc.GetElementById("fiction-header").Descendents<IElement>().FirstOrDefault(p => p.LocalName == "img")?.GetAttribute("src");
         }
 
-        protected virtual void RemoveNonTables(HtmlNode rootNode)
+        protected virtual void RemoveNonTables(IElement rootElement)
         {
-            var nodes = rootNode.Descendants("div").ToList();
-            
-            HtmlNode currentNode = nodes.FirstOrDefault();
-            while (currentNode != null)
+            var elements = rootElement.Descendents<IElement>().Where(p => p.LocalName == "div").ToList();
+
+            IElement currentElement = elements.FirstOrDefault();
+            while (currentElement != null)
             {
-                if (!currentNode.Descendants("table").Any())
-                {
-                    currentNode.Remove();
-                    nodes.Remove(currentNode);
-                }
+                var nonTables = currentElement.Descendents<IElement>().Where(p => p.LocalName != "table").ToList();
+
+                foreach (IElement nonTable in nonTables)
+                    nonTable.Remove();
                 
-                currentNode = currentNode.NextSibling;
+                currentElement = currentElement.NextElementSibling;
             }
 
-            nodes.Last().Remove();
+            elements.LastOrDefault(p => p.LocalName == "table")?.Remove();
+            
+            rootElement.RemoveChild(rootElement.LastChild);
         }
     }
 }

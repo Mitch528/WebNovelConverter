@@ -39,12 +39,8 @@
       <HintPath>..\packages\AngleSharp.0.9.4\lib\net45\AngleSharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Epub.Net, Version=1.0.12.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Epub.Net.1.0.12-beta\lib\net45\Epub.Net.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="HtmlAgilityPack, Version=1.4.9.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
-      <HintPath>..\packages\HtmlAgilityPack.1.4.9\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    <Reference Include="Epub.Net, Version=1.0.13.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Epub.Net.1.0.13-beta\lib\net45\Epub.Net.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.AspNet.Razor, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -88,7 +84,7 @@
     <Compile Include="Sources\NovelSourceCollection.cs" />
     <Compile Include="Sources\RoyalRoadL.cs" />
     <Compile Include="Sources\WebNovelSource.cs" />
-    <Compile Include="Sources\WordPress.cs" />
+    <Compile Include="Sources\WordPressSource.cs" />
     <Compile Include="UrlHelper.cs" />
     <Compile Include="WebNovelChapter.cs" />
     <EmbeddedResource Include="MainForm.resx">

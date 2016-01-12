@@ -19,7 +19,7 @@ namespace WebNovelConverter
 {
     public partial class MainForm : Form
     {
-        private readonly WordPress _wordpress = new WordPress();
+        private readonly WordPressSource _wordpress = new WordPressSource();
 
         private readonly NovelSourceCollection _sources = new NovelSourceCollection();
 
@@ -191,10 +191,10 @@ namespace WebNovelConverter
             string tocUrl = tocUrlTextBox.Text;
 
             WebNovelSource source = GetSource(tocUrl);
-            string coverUrl = await source.GetNovelCover(tocUrl);
+            string coverUrl = await source.GetNovelCoverAsync(tocUrl);
             coverUrl = coverUrl.StartsWith("//") ? coverUrl.Substring(2) : coverUrl;
 
-            ChapterLink[] links = await source.GetLinks(tocUrl);
+            ChapterLink[] links = (await source.GetChapterLinksAsync(tocUrl)).ToArray();
 
             Invoke((MethodInvoker)delegate
             {

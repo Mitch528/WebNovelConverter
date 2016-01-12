@@ -3,8 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using HtmlAgilityPack;
+using AngleSharp.Dom;
+using AngleSharp.Dom.Html;
+using AngleSharp.Extensions;
 
 namespace WebNovelConverter.Sources
 {
@@ -25,30 +28,44 @@ namespace WebNovelConverter.Sources
             "interlude"
         };
 
-        public override async Task<ChapterLink[]> GetLinks(string baseUrl)
+        public BakaTsuki() : base("BakaTsuki")
         {
-            string baseContent = await GetWebPage(baseUrl);
+        }
 
-            HtmlDocument baseDoc = new HtmlDocument();
-            baseDoc.LoadHtml(baseContent);
+        public override async Task<IEnumerable<ChapterLink>> GetChapterLinksAsync(string baseUrl, CancellationToken token = default(CancellationToken))
+        {
+            string baseContent = await GetWebPageAsync(baseUrl, token);
 
-            HtmlNode contentNode = baseDoc.GetElementbyId("mw-content-text");
+            IHtmlDocument doc = await Parser.ParseAsync(baseContent, token);
 
-            if (contentNode == null)
+            IElement contentElement = doc.GetElementById("mw-content-text");
+
+            if (contentElement == null)
                 return null;
 
-            var possibleChapters = contentNode.SelectNodes("//ul/li/a");
+            var possibleChapters = from e in contentElement.Descendents<IElement>()
+                                   where e.LocalName == "a"
+                                   let parent = e.ParentElement
+                                   where parent != null
+                                   where parent.LocalName == "li"
+                                   let secondParent = parent.ParentElement
+                                   where secondParent != null
+                                   where secondParent.LocalName == "ul"
+                                   select e;
 
-            if (possibleChapters == null)
-                return new ChapterLink[0];
+            return CollectChapterLinks(baseUrl, possibleChapters);
+        }
 
-            var links = new List<ChapterLink>();
-
-            foreach (HtmlNode possibleChapter in possibleChapters)
+        protected override IEnumerable<ChapterLink> CollectChapterLinks(string baseUrl, IEnumerable<IElement> linkElements, Func<IElement, bool> linkFilter = null)
+        {
+            foreach (IElement possibleChapter in linkElements)
             {
-                string chTitle = WebUtility.HtmlDecode(possibleChapter.InnerText);
-                string chLink = possibleChapter.Attributes["href"].Value;
-                chLink = new Uri(new Uri(BaseUrl), chLink).AbsoluteUri;
+                if (!possibleChapter.HasAttribute("href"))
+                    continue;
+
+                string chTitle = WebUtility.HtmlDecode(possibleChapter.TextContent);
+                string chLink = possibleChapter.GetAttribute("href");
+                chLink = UrlHelper.ToAbsoluteUrl(BaseUrl, chLink);
 
                 ChapterLink link = new ChapterLink
                 {
@@ -60,75 +77,70 @@ namespace WebNovelConverter.Sources
                 if (PossibleChapterNameParts.Any(p => chTitle.IndexOf(p, StringComparison.CurrentCultureIgnoreCase) >= 0))
                     link.Unknown = false;
 
-                links.Add(link);
+                yield return link;
             }
-
-            return links.ToArray();
         }
 
-
-        public override Task<string> GetNovelCover(string baseUrl)
+        public override Task<string> GetNovelCoverAsync(string baseUrl, CancellationToken token = default(CancellationToken))
         {
             return Task.FromResult(string.Empty);
         }
 
-        public override async Task<WebNovelChapter> GetChapterAsync(ChapterLink link)
+        public override async Task<WebNovelChapter> GetChapterAsync(ChapterLink link, CancellationToken token = default(CancellationToken))
         {
-            string baseContent = await GetWebPage(link.Url);
+            string baseContent = await GetWebPageAsync(link.Url, token);
 
-            HtmlDocument baseDoc = new HtmlDocument();
-            baseDoc.LoadHtml(baseContent);
+            IHtmlDocument doc = await Parser.ParseAsync(baseContent, token);
+            IElement contentElement = doc.GetElementById("mw-content-text");
 
-            HtmlNode contentNode = baseDoc.GetElementbyId("mw-content-text");
-
-            if (contentNode == null)
+            if (contentElement == null)
                 return null;
 
-            baseDoc.GetElementbyId("toc")?.Remove();
+            doc.GetElementById("toc")?.Remove();
 
-            foreach (HtmlNode linkNode in contentNode.SelectNodes(".//a"))
+            foreach (IElement linkElement in contentElement.Descendents<IElement>().Where(p => p.LocalName == "a"))
             {
-                linkNode.SetAttributeValue("href", GetAbsoluteUrl(BaseUrl, WebUtility.HtmlDecode(linkNode.Attributes["href"].Value)));
+                if (!linkElement.HasAttribute("href"))
+                    continue;
 
-                HtmlNode imgNode = linkNode.SelectSingleNode("img");
+                string rel = WebUtility.HtmlDecode(linkElement.GetAttribute("href"));
 
-                if (imgNode != null)
+                linkElement.SetAttribute("href", UrlHelper.ToAbsoluteUrl(BaseUrl, rel));
+
+                IElement imgElement = linkElement.Descendents<IElement>().FirstOrDefault(p => p.LocalName == "img");
+
+                if (imgElement != null)
                 {
-                    foreach (HtmlAttribute attrib in imgNode.Attributes.Where(p => p.Name != "width" && p.Name != "height").ToList())
-                        attrib.Remove();
+                    foreach (var attrib in imgElement.Attributes.Where(p => p.LocalName != "width" && p.LocalName != "height").ToList())
+                        imgElement.RemoveAttribute(attrib.Name);
 
-                    string linkImgUrl = linkNode.Attributes["href"].Value;
-                    string imgPageContent = await GetWebPage(linkImgUrl);
+                    string linkImgUrl = linkElement.GetAttribute("href");
+                    string imgPageContent = await GetWebPageAsync(linkImgUrl, token);
 
-                    HtmlDocument imageDoc = new HtmlDocument();
-                    imageDoc.LoadHtml(imgPageContent);
+                    IHtmlDocument imgDoc = await Parser.ParseAsync(imgPageContent, token);
 
-                    HtmlNode fullImageNode = imageDoc.DocumentNode.SelectSingleNode("//div[@class='fullMedia']/a");
+                    IElement fullImageElement = (from e in imgDoc.Descendents<IElement>()
+                                                 where e.LocalName == "div"
+                                                 where e.HasAttribute("class")
+                                                 let classAttribute = e.GetAttribute("class")
+                                                 where classAttribute == "fullMedia"
+                                                 let imgLink = e.Descendents<IElement>().FirstOrDefault(p => p.LocalName == "a")
+                                                 select imgLink).FirstOrDefault();
 
-                    if (fullImageNode == null)
+                    if (fullImageElement == null || !fullImageElement.HasAttribute("href"))
                         continue;
 
-                    string imageLink = fullImageNode.Attributes["href"].Value;
+                    string imageLink = fullImageElement.GetAttribute("href");
 
-                    imgNode.SetAttributeValue("src", GetAbsoluteUrl(BaseUrl, imageLink));
+                    imgElement.SetAttribute("src", UrlHelper.ToAbsoluteUrl(BaseUrl, imageLink));
                 }
             }
 
             return new WebNovelChapter
             {
                 Url = link.Url,
-                Content = contentNode.InnerHtml
+                Content = contentElement.InnerHtml
             };
-        }
-
-        private static string GetAbsoluteUrl(string baseUrl, string url)
-        {
-            Uri uri = new Uri(url, UriKind.RelativeOrAbsolute);
-
-            if (!uri.IsAbsoluteUri)
-                uri = new Uri(new Uri(baseUrl), uri);
-
-            return uri.ToString();
         }
     }
 }
