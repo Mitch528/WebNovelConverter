@@ -353,7 +353,7 @@
             this.MaximizeBox = false;
             this.Menu = this.mainMenu1;
             this.Name = "MainForm";
-            this.Text = "Web Novel Converter v1.2.3";
+            this.Text = "Web Novel Converter v1.2.4";
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
