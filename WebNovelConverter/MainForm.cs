@@ -148,18 +148,26 @@ namespace WebNovelConverter
 
             foreach (ChapterLink link in chaptersListBox.Items)
             {
-                WebNovelSource source = GetSource(link.Url);
-                WebNovelChapter chapter = await source.GetChapterAsync(link);
+                try
+                {
+                    WebNovelSource source = GetSource(link.Url);
+                    WebNovelChapter chapter = await source.GetChapterAsync(link);
 
-                if (chapter == null)
+                    if (chapter == null)
+                    {
+                        WriteText($"Failed to process {link.Name}!", Color.Red);
+                    }
+                    else
+                    {
+                        book.Chapters.Add(new Chapter { Name = link.Name, Content = chapter.Content });
+
+                        WriteText($"{link.Name} has been processed.", Color.Green);
+                    }
+                }
+                catch (Exception ex)
                 {
                     WriteText($"Failed to process {link.Name}!", Color.Red);
-                }
-                else
-                {
-                    book.Chapters.Add(new Chapter { Name = link.Name, Content = chapter.Content });
-
-                    WriteText($"{link.Name} has been processed.", Color.Green);
+                    WriteText($"ERROR: {ex}", Color.Red);
                 }
 
                 await Task.Delay(TimeSpan.FromSeconds(Settings.Default.DelayPerChapter));
