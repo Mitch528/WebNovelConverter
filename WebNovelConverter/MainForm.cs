@@ -31,7 +31,7 @@ namespace WebNovelConverter
         private void MainForm_Load(object sender, EventArgs e)
         {
             _sources.Add(new RoyalRoadL());
-            _sources.Add(new BakaTsuki());
+            _sources.Add(new BakaTsukiSource());
         }
 
         private void retrieveButton_Click(object sender, EventArgs e)
@@ -177,7 +177,7 @@ namespace WebNovelConverter
 
             await book.GenerateEpubAsync(e.Argument.ToString());
 
-            WriteText("Done!");
+            WriteText("Done!", Color.Green);
 
             Invoke((MethodInvoker)delegate
             {
@@ -198,16 +198,6 @@ namespace WebNovelConverter
 
             Invoke((MethodInvoker)delegate
             {
-                if (links == null)
-                {
-                    MessageBox.Show("Error parsing website.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                    progressBar.Visible = false;
-                    retrieveButton.Enabled = true;
-
-                    return;
-                }
-
                 foreach (ChapterLink link in links)
                 {
                     if (link.Unknown)

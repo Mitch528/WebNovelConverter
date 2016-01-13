@@ -11,7 +11,7 @@ using AngleSharp.Extensions;
 
 namespace WebNovelConverter.Sources
 {
-    public class BakaTsuki : WebNovelSource
+    public class BakaTsukiSource : WebNovelSource
     {
         public override string BaseUrl => "https://www.baka-tsuki.org";
 
@@ -28,7 +28,7 @@ namespace WebNovelConverter.Sources
             "interlude"
         };
 
-        public BakaTsuki() : base("BakaTsuki")
+        public BakaTsukiSource() : base("BakaTsuki")
         {
         }
 

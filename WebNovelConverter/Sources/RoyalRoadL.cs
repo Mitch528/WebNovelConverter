@@ -71,8 +71,8 @@ namespace WebNovelConverter.Sources
 
             if (firstPostElement == null)
                 return null;
-            
-            RemoveNonTables(firstPostElement);
+
+            RemoveNavigation(firstPostElement);
 
             return new WebNovelChapter
             {
@@ -90,24 +90,9 @@ namespace WebNovelConverter.Sources
             return doc.GetElementById("fiction-header").Descendents<IElement>().FirstOrDefault(p => p.LocalName == "img")?.GetAttribute("src");
         }
 
-        protected virtual void RemoveNonTables(IElement rootElement)
+        protected virtual void RemoveNavigation(IElement rootElement)
         {
-            var elements = rootElement.Descendents<IElement>().Where(p => p.LocalName == "div").ToList();
-
-            IElement currentElement = elements.FirstOrDefault();
-            while (currentElement != null)
-            {
-                var nonTables = currentElement.Descendents<IElement>().Where(p => p.LocalName != "table").ToList();
-
-                foreach (IElement nonTable in nonTables)
-                    nonTable.Remove();
-                
-                currentElement = currentElement.NextElementSibling;
-            }
-
-            elements.LastOrDefault(p => p.LocalName == "table")?.Remove();
-            
-            rootElement.RemoveChild(rootElement.LastChild);
+            rootElement.Descendents<IElement>().LastOrDefault(p => p.LocalName == "table")?.Remove();
         }
     }
 }
