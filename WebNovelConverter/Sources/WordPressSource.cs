@@ -73,20 +73,9 @@ namespace WebNovelConverter.Sources
             string content;
             if (articleElement != null)
             {
-                IElement ifElement = articleElement.Descendents<IElement>().FirstOrDefault(p => p.LocalName == "iframe");
+                RemoveBloat(articleElement);
 
-                if (ifElement != null && ifElement.HasAttribute("src"))
-                {
-                    string ifUrl = ifElement.GetAttribute("src");
-
-                    content = await GetWebPageAsync(ifUrl, token);
-                }
-                else
-                {
-                    RemoveBloat(articleElement);
-
-                    content = articleElement.InnerHtml;
-                }
+                content = articleElement.InnerHtml;
             }
             else
             {
@@ -99,16 +88,9 @@ namespace WebNovelConverter.Sources
 
                 if (contentElement != null)
                 {
-                    if (contentElement.LocalName == "iframe")
-                    {
-                        content = contentElement.InnerHtml;
-                    }
-                    else
-                    {
-                        RemoveBloat(contentElement);
+                    RemoveBloat(contentElement);
 
-                        content = contentElement.OuterHtml;
-                    }
+                    content = contentElement.OuterHtml;
                 }
                 else
                 {
