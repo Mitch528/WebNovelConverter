@@ -32,6 +32,7 @@ namespace WebNovelConverter
         {
             _sources.Add(new RoyalRoadL());
             _sources.Add(new BakaTsukiSource());
+            _sources.Add(new WuxiaWorldSource());
         }
 
         private void retrieveButton_Click(object sender, EventArgs e)
