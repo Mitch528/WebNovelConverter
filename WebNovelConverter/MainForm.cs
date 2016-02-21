@@ -6,6 +6,8 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -14,6 +16,7 @@ using Epub.Net.Extensions;
 using Epub.Net.Models;
 using WebNovelConverter.Properties;
 using WebNovelConverter.Sources;
+using WebNovelConverter.Sources.Models;
 
 namespace WebNovelConverter
 {
@@ -30,14 +33,21 @@ namespace WebNovelConverter
 
         private void MainForm_Load(object sender, EventArgs e)
         {
+            Version ver = Assembly.GetExecutingAssembly().GetName().Version;
+            this.Text += $" {ver.Major}.{ver.Minor}.{ver.Build}";
+
             _sources.Add(new RoyalRoadL());
             _sources.Add(new BakaTsukiSource());
             _sources.Add(new WuxiaWorldSource());
+            _sources.Add(new NovelsNaoSource());
+
+            websiteTypeComboBox.SelectedIndex = 0;
+            modeComboBox.SelectedIndex = 0;
         }
 
         private void retrieveButton_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(tocUrlTextBox.Text))
+            if (string.IsNullOrEmpty(modeSelectedTextBox.Text))
             {
                 MessageBox.Show("Invalid url", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
@@ -46,6 +56,7 @@ namespace WebNovelConverter
 
             if (!retrieveBackgroundWorker.IsBusy)
             {
+                outputTextBox.ResetText();
                 chaptersListBox.Items.Clear();
                 unknownListBox.Items.Clear();
 
@@ -141,37 +152,65 @@ namespace WebNovelConverter
 
         private async void convertBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
+            string type = string.Empty;
+            string mode = string.Empty;
+            Invoke((MethodInvoker)delegate
+            {
+                type = ((string)websiteTypeComboBox.SelectedItem).ToLower();
+                mode = ((string)modeComboBox.SelectedItem).ToLower();
+            });
+
             EBook book = new EBook
             {
                 Title = titleTextBox.Text,
                 CoverImage = coverTextBox.Text
             };
 
-            foreach (ChapterLink link in chaptersListBox.Items)
+            if (mode == "next chapter link")
             {
-                try
+                Invoke((MethodInvoker)delegate
                 {
-                    WebNovelSource source = GetSource(link.Url);
-                    WebNovelChapter chapter = await source.GetChapterAsync(link);
+                    book.Chapters.AddRange(chaptersListBox.Items.Cast<WebNovelChapter>().Select(p => new Chapter
+                    {
+                        Name = p.ChapterName,
+                        Content = p.Content
+                    }));
+                });
+            }
+            else
+            {
+                List<ChapterLink> links = new List<ChapterLink>();
+                Invoke((MethodInvoker)delegate
+                {
+                    links.AddRange(chaptersListBox.Items.OfType<ChapterLink>());
+                });
 
-                    if (chapter == null)
+                foreach (ChapterLink link in links)
+                {
+                    try
+                    {
+                        WebNovelSource source = GetSource(link.Url, type);
+                        WebNovelChapter chapter = await source.GetChapterAsync(link);
+
+                        if (chapter == null)
+                        {
+                            WriteText($"Failed to process {link.Name}!", Color.Red);
+                        }
+                        else
+                        {
+                            book.Chapters.Add(new Chapter { Name = link.Name, Content = chapter.Content });
+
+                            WriteText($"{link.Name} has been processed.", Color.Green);
+                        }
+                    }
+                    catch (Exception ex)
                     {
                         WriteText($"Failed to process {link.Name}!", Color.Red);
+                        WriteText($"ERROR: {ex}", Color.Red);
                     }
-                    else
-                    {
-                        book.Chapters.Add(new Chapter { Name = link.Name, Content = chapter.Content });
 
-                        WriteText($"{link.Name} has been processed.", Color.Green);
-                    }
+                    await Task.Delay(TimeSpan.FromSeconds(Settings.Default.DelayPerChapter));
                 }
-                catch (Exception ex)
-                {
-                    WriteText($"Failed to process {link.Name}!", Color.Red);
-                    WriteText($"ERROR: {ex}", Color.Red);
-                }
-
-                await Task.Delay(TimeSpan.FromSeconds(Settings.Default.DelayPerChapter));
             }
 
             WriteText("Generating epub...");
@@ -189,34 +228,88 @@ namespace WebNovelConverter
 
         private async void retrieveBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
-            string tocUrl = tocUrlTextBox.Text;
-
-            WebNovelSource source = GetSource(tocUrl);
-            string coverUrl = await source.GetNovelCoverAsync(tocUrl);
-            coverUrl = coverUrl.StartsWith("//") ? coverUrl.Substring(2) : coverUrl;
-
-            ChapterLink[] links = (await source.GetChapterLinksAsync(tocUrl)).ToArray();
+            string type = string.Empty;
+            string mode = string.Empty;
+            string modeSelectedText = string.Empty;
 
             Invoke((MethodInvoker)delegate
             {
-                foreach (ChapterLink link in links)
+                type = ((string)websiteTypeComboBox.SelectedItem).ToLower();
+                mode = ((string)modeComboBox.SelectedItem).ToLower();
+                modeSelectedText = modeSelectedTextBox.Text;
+            });
+
+            WebNovelSource source = GetSource(modeSelectedText, type);
+            string coverUrl = await source.GetNovelCoverAsync(modeSelectedText);
+            coverUrl = coverUrl.StartsWith("//") ? coverUrl.Substring(2) : coverUrl;
+
+            if (mode == "table of contents")
+            {
+                ChapterLink[] links = (await source.GetChapterLinksAsync(modeSelectedText)).ToArray();
+
+                Invoke((MethodInvoker)delegate
                 {
-                    if (link.Unknown)
+                    foreach (ChapterLink link in links)
                     {
-                        unknownListBox.Items.Add(link);
+                        if (link.Unknown)
+                        {
+                            unknownListBox.Items.Add(link);
+                        }
+                        else
+                        {
+                            chaptersListBox.Items.Add(link);
+                        }
                     }
-                    else
+
+                    if (!string.IsNullOrEmpty(coverUrl))
+                        coverTextBox.Text = new UriBuilder(coverUrl).Uri.AbsoluteUri;
+
+                    progressBar.Visible = false;
+                    retrieveButton.Enabled = true;
+                });
+            }
+            else if (mode == "next chapter link")
+            {
+                ChapterLink firstChapter = new ChapterLink { Url = modeSelectedText };
+                ChapterLink current = firstChapter;
+
+                var chapters = new List<WebNovelChapter>();
+                while (true)
+                {
+                    WebNovelChapter chapter;
+                    try
                     {
-                        chaptersListBox.Items.Add(link);
+                        chapter = await source.GetChapterAsync(current);
                     }
+                    catch (HttpRequestException)
+                    {
+                        break;
+                    }
+
+                    if (chapter == null)
+                        break;
+
+                    if (string.IsNullOrEmpty(chapter.ChapterName))
+                        chapter.ChapterName = current.Url;
+
+                    chapters.Add(chapter);
+
+                    WriteText($"Found Chapter {chapter.ChapterName}", Color.Green);
+
+                    if (string.IsNullOrEmpty(chapter.NextChapterUrl) || chapter.Url == chapter.NextChapterUrl)
+                        break;
+
+                    current = new ChapterLink { Url = chapter.NextChapterUrl };
                 }
 
-                if (!string.IsNullOrEmpty(coverUrl))
-                    coverTextBox.Text = new UriBuilder(coverUrl).Uri.AbsoluteUri;
+                Invoke((MethodInvoker)delegate
+                {
+                    chaptersListBox.Items.AddRange(chapters.Cast<object>().ToArray());
 
-                progressBar.Visible = false;
-                retrieveButton.Enabled = true;
-            });
+                    progressBar.Visible = false;
+                    retrieveButton.Enabled = true;
+                });
+            }
         }
 
         private void settingsMenuItem_Click(object sender, EventArgs e)
@@ -251,9 +344,9 @@ namespace WebNovelConverter
             }
         }
 
-        private WebNovelSource GetSource(string url)
+        private WebNovelSource GetSource(string url, string fallbackType)
         {
-            return _sources.Get(url) ?? _wordpress;
+            return _sources.Get(url) ?? _sources.GetByName(fallbackType);
         }
 
         private void WriteText(string text)
@@ -280,6 +373,57 @@ namespace WebNovelConverter
                 outputTextBox.SelectionStart = outputTextBox.Text.Length;
                 outputTextBox.ScrollToCaret();
             });
+        }
+
+        private void reverseButton_Click(object sender, EventArgs e)
+        {
+            var items = chaptersListBox.Items.Cast<object>().ToArray();
+            chaptersListBox.Items.Clear();
+
+            chaptersListBox.Items.AddRange(items.Reverse().ToArray());
+        }
+
+        private void websiteTypeComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            modeComboBox.Items.Clear();
+
+            string type = (string)websiteTypeComboBox.SelectedItem;
+
+            switch (type.ToLower())
+            {
+                case "wordpress":
+                    modeComboBox.Items.AddRange(new object[] { "Table of Contents", "Next Chapter Link" });
+                    break;
+                case "royalroadl":
+                case "baka-tsuki":
+                    modeComboBox.Items.Add("Table of Contents");
+                    break;
+                default:
+                    modeComboBox.Items.Add("Table of Contents");
+                    break;
+            }
+
+            modeComboBox.SelectedIndex = 0;
+        }
+
+        private void modeComboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            string type = (string)modeComboBox.SelectedItem;
+
+            switch (type.ToLower())
+            {
+                case "table of contents":
+                    modeSelectedLabel.Text = "TOC Url";
+                    break;
+                case "next chapter link":
+                    modeSelectedLabel.Text = "Starting Chapter Url";
+                    break;
+            }
+
+            Size textSize = TextRenderer.MeasureText(modeSelectedLabel.Text, modeSelectedLabel.Font);
+
+            modeSelectedLabel.Location = new Point(modeSelectedTextBox.Location.X - textSize.Width - 10,
+                modeSelectedTextBox.Location.Y);
         }
     }
 }

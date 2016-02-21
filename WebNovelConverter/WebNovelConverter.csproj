@@ -9,8 +9,9 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>WebNovelConverter</RootNamespace>
     <AssemblyName>WebNovelConverter</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -31,6 +32,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup />
   <PropertyGroup>
     <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
@@ -65,7 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ChapterLink.cs" />
+    <Compile Include="Sources\Models\ChapterLink.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -81,13 +83,15 @@
       <DependentUpon>SettingsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Sources\BakaTsukiSource.cs" />
+    <Compile Include="Sources\Models\ChapterRetrievalOptions.cs" />
+    <Compile Include="Sources\NovelsNaoSource.cs" />
     <Compile Include="Sources\NovelSourceCollection.cs" />
     <Compile Include="Sources\RoyalRoadL.cs" />
     <Compile Include="Sources\WebNovelSource.cs" />
     <Compile Include="Sources\WordPressSource.cs" />
     <Compile Include="Sources\WuxiaWorldSource.cs" />
     <Compile Include="UrlHelper.cs" />
-    <Compile Include="WebNovelChapter.cs" />
+    <Compile Include="Sources\Models\WebNovelChapter.cs" />
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -99,6 +103,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <EmbeddedResource Include="SettingsForm.resx">
       <DependentUpon>SettingsForm.cs</DependentUpon>
@@ -120,7 +125,9 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\Rotate Right-64.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

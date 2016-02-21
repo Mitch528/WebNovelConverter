@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AngleSharp.Dom;
 using AngleSharp.Parser.Html;
+using WebNovelConverter.Sources.Models;
 
 namespace WebNovelConverter.Sources
 {
@@ -32,7 +33,7 @@ namespace WebNovelConverter.Sources
             throw new NotImplementedException();
         }
 
-        public virtual Task<WebNovelChapter> GetChapterAsync(ChapterLink link, CancellationToken token = default(CancellationToken))
+        public virtual Task<WebNovelChapter> GetChapterAsync(ChapterLink link, ChapterRetrievalOptions options = default(ChapterRetrievalOptions), CancellationToken token = default(CancellationToken))
         {
             throw new NotImplementedException();
         }

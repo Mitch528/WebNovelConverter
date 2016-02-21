@@ -19,12 +19,10 @@ namespace WebNovelConverter.Sources
         {
             base.RemoveBloat(element);
 
-            var toRemove = (from p in element.Descendents<IElement>()
-                            where p.LocalName == "p"
-                            from link in p.Descendents<IElement>()
-                            where link.LocalName == "a"
-                            where LinksToRemove.Any(x => x == link.Text().Trim())
-                            select link).ToList();
+            var toRemove = (from e in element.Descendents<IElement>()
+                            where e.LocalName == "a"
+                            where LinksToRemove.Any(x => x == e.Text().Trim())
+                            select e).ToList();
 
             foreach (IElement e in toRemove)
             {

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3">
-  <assemblyIdentity version="1.0.0.0" name="MyApplication.app"/>
+<assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
+  <assemblyIdentity version="1.0.0.0" name="WebNovelConverter.app"/>
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v2">
     <security>
       <requestedPrivileges xmlns="urn:schemas-microsoft-com:asm.v3">
@@ -20,6 +20,7 @@
       </requestedPrivileges>
     </security>
   </trustInfo>
+
   <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
     <application>
       <!-- A list of the Windows versions that this application has been tested on and is

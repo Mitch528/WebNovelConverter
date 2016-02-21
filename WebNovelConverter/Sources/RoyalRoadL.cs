@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using AngleSharp.Dom;
 using AngleSharp.Dom.Html;
 using AngleSharp.Extensions;
+using WebNovelConverter.Sources.Models;
 
 namespace WebNovelConverter.Sources
 {
@@ -56,7 +57,9 @@ namespace WebNovelConverter.Sources
             }
         }
 
-        public override async Task<WebNovelChapter> GetChapterAsync(ChapterLink link, CancellationToken token = default(CancellationToken))
+        public override async Task<WebNovelChapter> GetChapterAsync(ChapterLink link, 
+            ChapterRetrievalOptions options = default(ChapterRetrievalOptions),
+            CancellationToken token = default(CancellationToken))
         {
             string pageContent = await GetWebPageAsync(link.Url, token);
             

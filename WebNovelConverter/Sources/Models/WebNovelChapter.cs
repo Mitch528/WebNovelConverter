@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace WebNovelConverter
+﻿namespace WebNovelConverter.Sources.Models
 {
     public class WebNovelChapter
     {
@@ -13,6 +7,8 @@ namespace WebNovelConverter
         public int ChapterId { get; set; }
 
         public string ChapterName { get; set; }
+
+        public string NextChapterUrl { get; set; }
 
         public string Content { get; set; }
 

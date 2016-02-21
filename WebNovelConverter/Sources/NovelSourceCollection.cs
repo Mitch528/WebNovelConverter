@@ -48,6 +48,11 @@ namespace WebNovelConverter.Sources
             return _sources.SingleOrDefault(p => new UriBuilder(p.BaseUrl.Replace("www.", string.Empty)).Uri == uri);
         }
 
+        public WebNovelSource GetByName(string name)
+        {
+            return _sources.SingleOrDefault(p => p.SourceName.Equals(name, StringComparison.OrdinalIgnoreCase));
+        }
+
         public void CopyTo(WebNovelSource[] array, int arrayIndex)
         {
             _sources.CopyTo(array, arrayIndex);
