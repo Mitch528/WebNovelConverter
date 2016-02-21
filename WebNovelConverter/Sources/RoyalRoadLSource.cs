@@ -11,11 +11,11 @@ using WebNovelConverter.Sources.Models;
 
 namespace WebNovelConverter.Sources
 {
-    public class RoyalRoadL : WebNovelSource
+    public class RoyalRoadLSource : WebNovelSource
     {
         public override string BaseUrl => "http://royalroadl.com/";
 
-        public RoyalRoadL() : base("RoyalRoadL")
+        public RoyalRoadLSource() : base("RoyalRoadL")
         {
         }
 

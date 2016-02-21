@@ -86,7 +86,7 @@
     <Compile Include="Sources\Models\ChapterRetrievalOptions.cs" />
     <Compile Include="Sources\NovelsNaoSource.cs" />
     <Compile Include="Sources\NovelSourceCollection.cs" />
-    <Compile Include="Sources\RoyalRoadL.cs" />
+    <Compile Include="Sources\RoyalRoadLSource.cs" />
     <Compile Include="Sources\WebNovelSource.cs" />
     <Compile Include="Sources\WordPressSource.cs" />
     <Compile Include="Sources\WuxiaWorldSource.cs" />

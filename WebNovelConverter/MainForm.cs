@@ -22,8 +22,6 @@ namespace WebNovelConverter
 {
     public partial class MainForm : Form
     {
-        private readonly WordPressSource _wordpress = new WordPressSource();
-
         private readonly NovelSourceCollection _sources = new NovelSourceCollection();
 
         public MainForm()
@@ -36,7 +34,8 @@ namespace WebNovelConverter
             Version ver = Assembly.GetExecutingAssembly().GetName().Version;
             this.Text += $" {ver.Major}.{ver.Minor}.{ver.Build}";
 
-            _sources.Add(new RoyalRoadL());
+            _sources.Add(new WordPressSource());
+            _sources.Add(new RoyalRoadLSource());
             _sources.Add(new BakaTsukiSource());
             _sources.Add(new WuxiaWorldSource());
             _sources.Add(new NovelsNaoSource());
@@ -238,6 +237,11 @@ namespace WebNovelConverter
                 mode = ((string)modeComboBox.SelectedItem).ToLower();
                 modeSelectedText = modeSelectedTextBox.Text;
             });
+
+            if (!(modeSelectedText.StartsWith("http://") || modeSelectedText.StartsWith("https://")))
+                modeSelectedText = "http://" + modeSelectedText;
+
+            Console.WriteLine(modeSelectedText);
 
             WebNovelSource source = GetSource(modeSelectedText, type);
             string coverUrl = await source.GetNovelCoverAsync(modeSelectedText);

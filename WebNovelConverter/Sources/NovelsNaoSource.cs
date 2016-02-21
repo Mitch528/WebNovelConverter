@@ -31,7 +31,7 @@ namespace WebNovelConverter.Sources
             "Table of Contents"
         };
 
-        public NovelsNaoSource()
+        public NovelsNaoSource() : base("NovelsNao")
         {
             PostClasses.AddRange(_postClasses);
             PageClasses.AddRange(_pageClasses);

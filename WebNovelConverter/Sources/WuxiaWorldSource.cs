@@ -15,6 +15,10 @@ namespace WebNovelConverter.Sources
             "Previous Chapter"
         };
 
+        public WuxiaWorldSource() : base("WuxiaWorld")
+        {
+        }
+
         protected override void RemoveBloat(IElement element)
         {
             base.RemoveBloat(element);

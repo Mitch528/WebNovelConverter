@@ -43,14 +43,19 @@ namespace WebNovelConverter.Sources
 
         public WebNovelSource Get(string sourceUrl)
         {
-            Uri uri = new Uri(new UriBuilder(sourceUrl.Replace("www.", string.Empty)).Uri.GetLeftPart(UriPartial.Authority));
+            Uri uri;
+            if (!Uri.TryCreate(sourceUrl.Replace("www.", string.Empty), UriKind.Absolute, out uri))
+                return null;
 
-            return _sources.SingleOrDefault(p => new UriBuilder(p.BaseUrl.Replace("www.", string.Empty)).Uri == uri);
+            uri = new Uri(uri.GetLeftPart(UriPartial.Authority));
+            
+            return _sources.Where(p => !string.IsNullOrEmpty(p.BaseUrl))
+                .SingleOrDefault(p => new UriBuilder(p.BaseUrl.Replace("www.", string.Empty)).Uri == uri);
         }
 
         public WebNovelSource GetByName(string name)
         {
-            return _sources.SingleOrDefault(p => p.SourceName.Equals(name, StringComparison.OrdinalIgnoreCase));
+            return _sources.FirstOrDefault(p => p.SourceName.Equals(name, StringComparison.OrdinalIgnoreCase));
         }
 
         public void CopyTo(WebNovelSource[] array, int arrayIndex)

@@ -59,6 +59,10 @@ namespace WebNovelConverter.Sources
         {
         }
 
+        public WordPressSource(string type) : base(type)
+        {
+        }
+
         public override async Task<IEnumerable<ChapterLink>> GetChapterLinksAsync(string baseUrl, CancellationToken token = default(CancellationToken))
         {
             string baseContent = await GetWebPageAsync(baseUrl, token);
