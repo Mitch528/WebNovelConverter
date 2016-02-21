@@ -241,8 +241,6 @@ namespace WebNovelConverter
             if (!(modeSelectedText.StartsWith("http://") || modeSelectedText.StartsWith("https://")))
                 modeSelectedText = "http://" + modeSelectedText;
 
-            Console.WriteLine(modeSelectedText);
-
             WebNovelSource source = GetSource(modeSelectedText, type);
             string coverUrl = await source.GetNovelCoverAsync(modeSelectedText);
             coverUrl = coverUrl.StartsWith("//") ? coverUrl.Substring(2) : coverUrl;
