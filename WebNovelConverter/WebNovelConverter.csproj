@@ -41,8 +41,8 @@
       <HintPath>..\packages\AngleSharp.0.9.4\lib\net45\AngleSharp.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Epub.Net, Version=1.0.13.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Epub.Net.1.0.13-beta\lib\net45\Epub.Net.dll</HintPath>
+    <Reference Include="Epub.Net, Version=1.0.15.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Epub.Net.1.0.15-beta\lib\net45\Epub.Net.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.AspNet.Razor, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -50,8 +50,8 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.VisualBasic" />
-    <Reference Include="RazorEngine, Version=4.2.6.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RazorEngine.4.2.6-beta1\lib\net45\RazorEngine.dll</HintPath>
+    <Reference Include="RazorEngine, Version=4.2.7.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RazorEngine.4.2.7-beta1\lib\net45\RazorEngine.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -67,6 +67,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\ElementExtensions.cs" />
+    <Compile Include="Sources\BlogspotSource.cs" />
     <Compile Include="Sources\Models\ChapterLink.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>

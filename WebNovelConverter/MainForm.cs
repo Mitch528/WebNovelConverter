@@ -37,6 +37,7 @@ namespace WebNovelConverter
             _sources.Add(new WordPressSource());
             _sources.Add(new RoyalRoadLSource());
             _sources.Add(new BakaTsukiSource());
+            _sources.Add(new BlogspotSource());
             _sources.Add(new WuxiaWorldSource());
             _sources.Add(new NovelsNaoSource());
 
@@ -46,7 +47,8 @@ namespace WebNovelConverter
 
         private void retrieveButton_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrEmpty(modeSelectedTextBox.Text))
+            Uri uri;
+            if (string.IsNullOrEmpty(modeSelectedTextBox.Text) || !Uri.TryCreate(modeSelectedTextBox.Text, UriKind.Absolute, out uri))
             {
                 MessageBox.Show("Invalid url", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 
@@ -165,27 +167,18 @@ namespace WebNovelConverter
                 CoverImage = coverTextBox.Text
             };
 
-            if (mode == "next chapter link")
+            var items = new List<object>();
+            Invoke((MethodInvoker)delegate
             {
-                Invoke((MethodInvoker)delegate
-                {
-                    book.Chapters.AddRange(chaptersListBox.Items.Cast<WebNovelChapter>().Select(p => new Chapter
-                    {
-                        Name = p.ChapterName,
-                        Content = p.Content
-                    }));
-                });
-            }
-            else
-            {
-                List<ChapterLink> links = new List<ChapterLink>();
-                Invoke((MethodInvoker)delegate
-                {
-                    links.AddRange(chaptersListBox.Items.OfType<ChapterLink>());
-                });
+                items.AddRange(chaptersListBox.Items.Cast<object>());
+            });
 
-                foreach (ChapterLink link in links)
+            foreach (object obj in items)
+            {
+                if (obj is ChapterLink)
                 {
+                    ChapterLink link = (ChapterLink)obj;
+
                     try
                     {
                         WebNovelSource source = GetSource(link.Url, type);
@@ -208,13 +201,28 @@ namespace WebNovelConverter
                         WriteText($"ERROR: {ex}", Color.Red);
                     }
 
-                    await Task.Delay(TimeSpan.FromSeconds(Settings.Default.DelayPerChapter));
+                    if (Settings.Default.DelayPerChapter > 0)
+                        await Task.Delay(TimeSpan.FromSeconds(Settings.Default.DelayPerChapter));
+                }
+                else if (obj is WebNovelChapter)
+                {
+                    WebNovelChapter wn = (WebNovelChapter)obj;
+
+                    book.Chapters.Add(new Chapter { Name = wn.ChapterName, Content = wn.Content });
                 }
             }
 
             WriteText("Generating epub...");
 
-            await book.GenerateEpubAsync(e.Argument.ToString());
+            try
+            {
+                await book.GenerateEpubAsync(e.Argument.ToString());
+            }
+            catch (Exception ex)
+            {
+                WriteText("Error generating Epub", Color.Red);
+                WriteText($"ERROR: {ex}", Color.Red);
+            }
 
             WriteText("Done!", Color.Green);
 
@@ -394,6 +402,7 @@ namespace WebNovelConverter
             switch (type.ToLower())
             {
                 case "wordpress":
+                case "blogspot":
                     modeComboBox.Items.AddRange(new object[] { "Table of Contents", "Next Chapter Link" });
                     break;
                 case "royalroadl":
@@ -415,10 +424,10 @@ namespace WebNovelConverter
             switch (type.ToLower())
             {
                 case "table of contents":
-                    modeSelectedLabel.Text = "TOC Url";
+                    modeSelectedLabel.Text = "TOC URL";
                     break;
                 case "next chapter link":
-                    modeSelectedLabel.Text = "Starting Chapter Url";
+                    modeSelectedLabel.Text = "Starting Chapter URL";
                     break;
             }
 

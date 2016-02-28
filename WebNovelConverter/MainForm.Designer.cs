@@ -343,7 +343,8 @@
             this.websiteTypeComboBox.Items.AddRange(new object[] {
             "WordPress",
             "RoyalRoadL",
-            "Baka-Tsuki"});
+            "Baka-Tsuki",
+            "Blogspot"});
             this.websiteTypeComboBox.Location = new System.Drawing.Point(314, 12);
             this.websiteTypeComboBox.Name = "websiteTypeComboBox";
             this.websiteTypeComboBox.Size = new System.Drawing.Size(265, 33);

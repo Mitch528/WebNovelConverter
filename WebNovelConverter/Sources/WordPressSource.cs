@@ -7,13 +7,14 @@ using AngleSharp.Dom;
 using AngleSharp.Dom.Html;
 using AngleSharp.Extensions;
 using AngleSharp.Parser.Html;
+using WebNovelConverter.Extensions;
 using WebNovelConverter.Sources.Models;
 
 namespace WebNovelConverter.Sources
 {
     public class WordPressSource : WebNovelSource
     {
-        protected static readonly List<string> BloatClasses = new List<string>
+        protected readonly List<string> BloatClasses = new List<string>
         {
             "sharedaddy",
             "share-story-container",
@@ -22,16 +23,17 @@ namespace WebNovelConverter.Sources
             "pagination"
         };
 
-        protected static readonly List<string> PageClasses = new List<string>
+        protected readonly List<string> PageClasses = new List<string>
         {
             "post-entry",
             "entry-content",
             "post-content",
             "the-content",
-            "entry"
+            "entry",
+            "page-body"
         };
 
-        protected static readonly List<string> PostClasses = new List<string>
+        protected readonly List<string> PostClasses = new List<string>
         {
             "post-entry",
             "entry-content",
@@ -39,18 +41,18 @@ namespace WebNovelConverter.Sources
             "postbody"
         };
 
-        protected static readonly List<string> PaginationClasses = new List<string>
+        protected readonly List<string> PaginationClasses = new List<string>
         {
             "pagination"
         };
 
-        protected static readonly List<string> TitleClasses = new List<string>
+        protected readonly List<string> TitleClasses = new List<string>
         {
             "entry-title",
             "post-title"
         };
 
-        protected static readonly List<string> NextChapterNames = new List<string>
+        protected readonly List<string> NextChapterNames = new List<string>
         {
             "Next Chapter"
         };
@@ -115,20 +117,10 @@ namespace WebNovelConverter.Sources
 
         protected virtual WebNovelChapter ParseChapter(IElement rootElement, CancellationToken token = default(CancellationToken))
         {
-            IElement element = (from e in rootElement.Descendents<IElement>()
-                                where e.HasAttribute("class")
-                                let names = e.GetAttribute("class").Split(' ')
-                                from name in PostClasses
-                                where names.Any(p => p.IndexOf(name, StringComparison.OrdinalIgnoreCase) >= 0)
-                                select e).FirstOrDefault()
+            IElement element = rootElement.FirstWhereHasClass(PostClasses)
                                     ?? rootElement.Descendents<IElement>().FirstOrDefault(p => p.LocalName == "article");
 
-            IElement chapterNameElement = (from e in rootElement.Descendents<IElement>()
-                                           where e.HasAttribute("class")
-                                           let names = e.GetAttribute("class").Split(' ')
-                                           from name in TitleClasses
-                                           where names.Any(p => p.IndexOf(name, StringComparison.OrdinalIgnoreCase) >= 0)
-                                           select e).FirstOrDefault();
+            IElement chapterNameElement = rootElement.FirstWhereHasClass(TitleClasses);
 
             if (chapterNameElement == null)
             {
@@ -182,13 +174,8 @@ namespace WebNovelConverter.Sources
 
         protected virtual IEnumerable<string> GetPagedChapterUrls(IElement rootElement)
         {
-            var pagElements = (from element in rootElement.Descendents<IElement>()
-                               where element.LocalName == "div"
-                               where element.HasAttribute("class")
-                               let names = element.GetAttribute("class").Split(' ')
-                               from name in names
-                               where PaginationClasses.Any(p => p.IndexOf(name, StringComparison.OrdinalIgnoreCase) >= 0)
-                               select element).FirstOrDefault()?.Descendents<IElement>();
+            var pagElements = rootElement.FirstWhereHasClass(PaginationClasses, e => e.LocalName == "div")
+                ?.Descendents<IElement>();
 
             pagElements = pagElements?.Where(p => p.LocalName == "a");
 
@@ -200,12 +187,7 @@ namespace WebNovelConverter.Sources
 
         protected virtual void RemoveBloat(IElement element)
         {
-            var shareElements = (from e in element.Descendents<IElement>()
-                                 where e.HasAttribute("class")
-                                 let names = e.GetAttribute("class").Split(' ')
-                                 from name in names
-                                 where BloatClasses.Any(p => p.IndexOf(name, StringComparison.OrdinalIgnoreCase) >= 0)
-                                 select e).Distinct().ToList();
+            var shareElements = element.WhereHasClass(BloatClasses);
 
             foreach (IElement e in shareElements)
             {

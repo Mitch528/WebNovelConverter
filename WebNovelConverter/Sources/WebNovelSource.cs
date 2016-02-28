@@ -40,7 +40,7 @@ namespace WebNovelConverter.Sources
 
         public virtual Task<string> GetNovelCoverAsync(string baseUrl, CancellationToken token = default(CancellationToken))
         {
-            throw new NotImplementedException();
+            return Task.FromResult(string.Empty);
         }
 
         protected virtual IEnumerable<ChapterLink> CollectChapterLinks(string baseUrl, IEnumerable<IElement> linkElements,

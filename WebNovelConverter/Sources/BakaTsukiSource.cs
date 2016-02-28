@@ -87,7 +87,7 @@ namespace WebNovelConverter.Sources
             return Task.FromResult(string.Empty);
         }
 
-        public override async Task<WebNovelChapter> GetChapterAsync(ChapterLink link, 
+        public override async Task<WebNovelChapter> GetChapterAsync(ChapterLink link,
             ChapterRetrievalOptions options = default(ChapterRetrievalOptions),
             CancellationToken token = default(CancellationToken))
         {
