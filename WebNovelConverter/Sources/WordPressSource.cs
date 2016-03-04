@@ -38,7 +38,8 @@ namespace WebNovelConverter.Sources
             "post-entry",
             "entry-content",
             "post-content",
-            "postbody"
+            "postbody",
+            "page-body"
         };
 
         protected readonly List<string> PaginationClasses = new List<string>
@@ -54,7 +55,9 @@ namespace WebNovelConverter.Sources
 
         protected readonly List<string> NextChapterNames = new List<string>
         {
-            "Next Chapter"
+            "Next Chapter",
+            "Next Page",
+            "Next"
         };
 
         public WordPressSource() : base("WordPress")
@@ -121,10 +124,10 @@ namespace WebNovelConverter.Sources
                                     ?? rootElement.Descendents<IElement>().FirstOrDefault(p => p.LocalName == "article");
 
             IElement chapterNameElement = rootElement.FirstWhereHasClass(TitleClasses);
-
+            
             if (chapterNameElement == null)
             {
-                chapterNameElement = (from e in rootElement.Descendents<IElement>()
+                chapterNameElement = (from e in element.Descendents<IElement>()
                                       where e.LocalName == "h1" || e.LocalName == "h2"
                                         || e.LocalName == "h3" || e.LocalName == "h4"
                                       select e).FirstOrDefault();
@@ -139,13 +142,13 @@ namespace WebNovelConverter.Sources
                     chapterNameElement = chNameLinkElement;
             }
 
-            IElement nextChapterElement = (from e in element?.Descendents<IElement>() ?? new List<IElement>()
+            IElement nextChapterElement = (from e in rootElement.Descendents<IElement>() ?? new List<IElement>()
                                            where e.LocalName == "a"
                                            let text = e.Text()
-                                           from name in NextChapterNames
-                                           where text.IndexOf(name, StringComparison.OrdinalIgnoreCase) >= 0
+                                           where NextChapterNames.Any(p => text.IndexOf(p, StringComparison.OrdinalIgnoreCase) >= 0)
+                                            || (e.HasAttribute("rel") && e.GetAttribute("rel") == "next")
                                            select e).FirstOrDefault();
-
+            
             WebNovelChapter chapter = new WebNovelChapter();
             if (nextChapterElement != null)
             {
@@ -156,7 +159,7 @@ namespace WebNovelConverter.Sources
             {
                 RemoveBloat(element);
 
-                chapter.ChapterName = chapterNameElement?.Text();
+                chapter.ChapterName = chapterNameElement?.Text()?.Trim();
                 chapter.Content = element.InnerHtml;
             }
             else
