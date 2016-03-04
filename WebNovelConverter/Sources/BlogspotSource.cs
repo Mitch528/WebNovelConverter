@@ -95,6 +95,9 @@ namespace WebNovelConverter.Sources
             IElement element = rootElement.WhereHasClass(PostClasses).LastOrDefault()
                 ?? rootElement.Descendents<IElement>().FirstOrDefault(p => p.LocalName == "article");
 
+            if (element != null)
+                RemoveBloat(element);
+
             IElement nextChapterElement = (from e in rootElement?.Descendents<IElement>() ?? new List<IElement>()
                                            where e.LocalName == "a"
                                            let text = e.Text()
@@ -109,8 +112,6 @@ namespace WebNovelConverter.Sources
 
             if (element != null)
             {
-                RemoveBloat(element);
-
                 chapter.Content = element.InnerHtml;
             }
             else
@@ -129,6 +130,10 @@ namespace WebNovelConverter.Sources
             {
                 e.Remove();
             }
+        }
+
+        protected virtual void RemoveNavigation(IElement element)
+        {
         }
     }
 }

@@ -37,7 +37,7 @@ namespace WebNovelConverter.Sources
             PageClasses.AddRange(_pageClasses);
         }
 
-        protected override void RemoveBloat(IElement element)
+        protected override void RemoveNavigation(IElement element)
         {
             base.RemoveBloat(element);
 

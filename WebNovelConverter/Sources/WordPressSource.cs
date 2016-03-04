@@ -50,7 +50,8 @@ namespace WebNovelConverter.Sources
         protected readonly List<string> TitleClasses = new List<string>
         {
             "entry-title",
-            "post-title"
+            "post-title",
+            "page-title"
         };
 
         protected readonly List<string> NextChapterNames = new List<string>
@@ -123,8 +124,11 @@ namespace WebNovelConverter.Sources
             IElement element = rootElement.FirstWhereHasClass(PostClasses)
                                     ?? rootElement.Descendents<IElement>().FirstOrDefault(p => p.LocalName == "article");
 
+            if (element != null)
+                RemoveBloat(element);
+
             IElement chapterNameElement = rootElement.FirstWhereHasClass(TitleClasses);
-            
+
             if (chapterNameElement == null)
             {
                 chapterNameElement = (from e in element.Descendents<IElement>()
@@ -148,7 +152,7 @@ namespace WebNovelConverter.Sources
                                            where NextChapterNames.Any(p => text.IndexOf(p, StringComparison.OrdinalIgnoreCase) >= 0)
                                             || (e.HasAttribute("rel") && e.GetAttribute("rel") == "next")
                                            select e).FirstOrDefault();
-            
+
             WebNovelChapter chapter = new WebNovelChapter();
             if (nextChapterElement != null)
             {
@@ -157,7 +161,7 @@ namespace WebNovelConverter.Sources
 
             if (element != null)
             {
-                RemoveBloat(element);
+                RemoveNavigation(element);
 
                 chapter.ChapterName = chapterNameElement?.Text()?.Trim();
                 chapter.Content = element.InnerHtml;
@@ -196,6 +200,10 @@ namespace WebNovelConverter.Sources
             {
                 e.Remove();
             }
+        }
+
+        protected virtual void RemoveNavigation(IElement element)
+        {
         }
     }
 }

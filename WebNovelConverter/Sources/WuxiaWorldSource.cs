@@ -19,7 +19,7 @@ namespace WebNovelConverter.Sources
         {
         }
 
-        protected override void RemoveBloat(IElement element)
+        protected override void RemoveNavigation(IElement element)
         {
             base.RemoveBloat(element);
 
