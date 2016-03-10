@@ -32,7 +32,8 @@ namespace WebNovelConverter.Sources
 
         protected readonly List<string> NextChapterNames = new List<string>
         {
-            "Next Chapter"
+            "Next Chapter",
+            "Next"
         };
 
         protected readonly List<string> BloatClasses = new List<string>
@@ -101,8 +102,9 @@ namespace WebNovelConverter.Sources
             IElement nextChapterElement = (from e in rootElement?.Descendents<IElement>() ?? new List<IElement>()
                                            where e.LocalName == "a"
                                            let text = e.Text()
-                                           from name in NextChapterNames
-                                           where text.IndexOf(name, StringComparison.OrdinalIgnoreCase) >= 0
+                                           let a = NextChapterNames.FirstOrDefault(p => text.IndexOf(p, StringComparison.OrdinalIgnoreCase) >= 0)
+                                           where a != null
+                                           orderby NextChapterNames.IndexOf(a)
                                            select e).FirstOrDefault();
 
             if (nextChapterElement != null)

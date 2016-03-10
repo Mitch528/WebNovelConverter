@@ -149,8 +149,9 @@ namespace WebNovelConverter.Sources
             IElement nextChapterElement = (from e in rootElement.Descendents<IElement>() ?? new List<IElement>()
                                            where e.LocalName == "a"
                                            let text = e.Text()
-                                           where NextChapterNames.Any(p => text.IndexOf(p, StringComparison.OrdinalIgnoreCase) >= 0)
-                                            || (e.HasAttribute("rel") && e.GetAttribute("rel") == "next")
+                                           let a = NextChapterNames.FirstOrDefault(p => text.IndexOf(p, StringComparison.OrdinalIgnoreCase) >= 0)
+                                           where a != null || (e.HasAttribute("rel") && e.GetAttribute("rel") == "next")
+                                           orderby NextChapterNames.IndexOf(a)
                                            select e).FirstOrDefault();
 
             WebNovelChapter chapter = new WebNovelChapter();
