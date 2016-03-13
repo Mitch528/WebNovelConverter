@@ -80,7 +80,7 @@ namespace WebNovelConverter.Sources
                 UriBuilder uriBuilder = new UriBuilder(url);
 
                 var resp = await client.GetAsync(uriBuilder.Uri, token);
-                resp.EnsureSuccessStatusCode();
+                //resp.EnsureSuccessStatusCode();
 
                 byte[] content = await resp.Content.ReadAsByteArrayAsync();
 
