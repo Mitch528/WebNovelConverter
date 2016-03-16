@@ -39,7 +39,9 @@ namespace WebNovelConverter.Sources
             "entry-content",
             "post-content",
             "postbody",
-            "page-body"
+            "page-body",
+            "post",
+            "hentry"
         };
 
         protected readonly List<string> PaginationClasses = new List<string>
@@ -129,7 +131,7 @@ namespace WebNovelConverter.Sources
 
             IElement chapterNameElement = rootElement.FirstWhereHasClass(TitleClasses);
 
-            if (chapterNameElement == null)
+            if (element != null && chapterNameElement == null)
             {
                 chapterNameElement = (from e in element.Descendents<IElement>()
                                       where e.LocalName == "h1" || e.LocalName == "h2"

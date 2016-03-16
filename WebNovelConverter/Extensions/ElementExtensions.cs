@@ -21,6 +21,7 @@ namespace WebNovelConverter.Extensions
                     let names = e.GetAttribute("class").Split(' ')
                     from name in classes
                     where names.Any(p => p.Equals(name, StringComparison.OrdinalIgnoreCase))
+                    orderby classes.IndexOf(name)
                     select e).FirstOrDefault();
         }
 
@@ -35,6 +36,7 @@ namespace WebNovelConverter.Extensions
                     let names = e.GetAttribute("class").Split(' ')
                     from name in classes
                     where names.Any(p => p.Equals(name, StringComparison.OrdinalIgnoreCase))
+                    orderby classes.IndexOf(name)
                     select e).Distinct().ToList();
         }
     }
