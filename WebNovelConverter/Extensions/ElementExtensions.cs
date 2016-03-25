@@ -19,9 +19,13 @@ namespace WebNovelConverter.Extensions
                     where e.HasAttribute("class")
                     where filter?.Invoke(e) ?? true
                     let names = e.GetAttribute("class").Split(' ')
-                    from name in classes
-                    where names.Any(p => p.Equals(name, StringComparison.OrdinalIgnoreCase))
-                    orderby classes.IndexOf(name)
+                    let a = (from cl in classes
+                             from name in names
+                             where cl.Equals(name, StringComparison.OrdinalIgnoreCase)
+                             select cl).FirstOrDefault()
+                    where a != null
+                    let index = classes.IndexOf(a)
+                    orderby index
                     select e).FirstOrDefault();
         }
 

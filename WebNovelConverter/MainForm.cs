@@ -38,7 +38,6 @@ namespace WebNovelConverter
             _sources.Add(new RoyalRoadLSource());
             _sources.Add(new BakaTsukiSource());
             _sources.Add(new BlogspotSource());
-            _sources.Add(new WuxiaWorldSource());
             _sources.Add(new NovelsNaoSource());
 
             websiteTypeComboBox.SelectedIndex = 0;
