@@ -89,16 +89,10 @@ namespace WebNovelConverter.Sources
 
             IHtmlDocument doc = await Parser.ParseAsync(baseContent, token);
 
-            var divElements = from e in doc.All
-                              where e.LocalName == "div"
-                              where e.HasAttribute("class")
-                              let names = e.GetAttribute("class").Split(' ')
-                              from name in names
-                              where PageClasses.Any(p => p.IndexOf(name, StringComparison.OrdinalIgnoreCase) >= 0)
-                              select e;
+            var pgElement = doc.DocumentElement.FirstWhereHasClass(PageClasses);
 
-            IElement element = divElements.FirstOrDefault();
-
+            IElement element = pgElement ?? doc.Descendents<IElement>().FirstOrDefault(p => p.LocalName == "article");
+            
             if (element == null)
                 return EmptyLinks;
 
@@ -120,6 +114,7 @@ namespace WebNovelConverter.Sources
                 return null;
 
             chapter.Url = link.Url;
+            chapter.NextChapterUrl = UrlHelper.ToAbsoluteUrl(link.Url, chapter.NextChapterUrl);
 
             foreach (var page in paged)
             {

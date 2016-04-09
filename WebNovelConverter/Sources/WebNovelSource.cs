@@ -76,10 +76,8 @@ namespace WebNovelConverter.Sources
             using (HttpClient client = new HttpClient())
             {
                 client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("WebNovelConverter", "1.0"));
-
-                UriBuilder uriBuilder = new UriBuilder(url);
-
-                var resp = await client.GetAsync(uriBuilder.Uri, token);
+                
+                var resp = await client.GetAsync(url, token);
                 //resp.EnsureSuccessStatusCode();
 
                 byte[] content = await resp.Content.ReadAsByteArrayAsync();
