@@ -84,13 +84,21 @@ namespace WebNovelConverter.Sources
             };
         }
 
-        public override async Task<string> GetNovelCoverAsync(string baseUrl, CancellationToken token = default(CancellationToken))
+        public override async Task<WebNovelInfo> GetNovelInfoAsync(string baseUrl, CancellationToken token = default(CancellationToken))
         {
             string baseContent = await GetWebPageAsync(baseUrl, token);
 
             IHtmlDocument doc = await Parser.ParseAsync(baseContent, token);
 
-            return doc.GetElementById("fiction-header").Descendents<IElement>().FirstOrDefault(p => p.LocalName == "img")?.GetAttribute("src");
+            var fictionHeaderDes = doc.GetElementById("fiction-header");
+            var coverUrl = fictionHeaderDes.Descendents<IElement>().FirstOrDefault(p => p.LocalName == "img")?.GetAttribute("src");
+            var title = fictionHeaderDes.QuerySelector("h1.fiction-title")?.TextContent;
+
+            return new WebNovelInfo()
+            {
+                CoverUrl = coverUrl,
+                Title = title
+            };
         }
 
         protected virtual void RemoveNavigation(IElement rootElement)

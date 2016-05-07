@@ -187,11 +187,6 @@ namespace WebNovelConverter.Sources
             return chapter;
         }
 
-        public override Task<string> GetNovelCoverAsync(string baseUrl, CancellationToken token = new CancellationToken())
-        {
-            return Task.FromResult(string.Empty);
-        }
-
         protected virtual IEnumerable<string> GetPagedChapterUrls(IElement rootElement)
         {
             var pagElements = rootElement.FirstWhereHasClass(PaginationClasses, e => e.LocalName == "div")

@@ -9,6 +9,7 @@ using AngleSharp.Dom;
 using AngleSharp.Dom.Html;
 using AngleSharp.Extensions;
 using WebNovelConverter.Sources.Models;
+using System.Text.RegularExpressions;
 
 namespace WebNovelConverter.Sources
 {
@@ -82,9 +83,39 @@ namespace WebNovelConverter.Sources
             }
         }
 
-        public override Task<string> GetNovelCoverAsync(string baseUrl, CancellationToken token = default(CancellationToken))
+        public override async Task<WebNovelInfo> GetNovelInfoAsync(string baseUrl, CancellationToken token = default(CancellationToken))
         {
-            return Task.FromResult(string.Empty);
+            string baseContent = await GetWebPageAsync(baseUrl, token);
+
+            IHtmlDocument doc = await Parser.ParseAsync(baseContent, token);
+
+            var title = doc.QuerySelector("h1#firstHeading span")?.TextContent;
+
+            string coverUrl = null;
+            var coverUrlEl = doc.QuerySelector("div.thumb a.image img.thumbimage[src*=cover]");
+            if( coverUrlEl != null)
+            {
+                coverUrl = coverUrlEl.Attributes["src"].Value;
+
+                // Bigger thumbnail
+                if(coverUrl.Contains("width=") && coverUrlEl.HasAttribute("data-file-width"))
+                {
+                    var width = Math.Min(int.Parse(coverUrlEl.Attributes["data-file-width"].Value)-1, 500);
+                    coverUrl = Regex.Replace(coverUrl, @"width\=([0-9]+)", "width=" + width);
+                }
+
+                // Make URL absolute
+                if( coverUrl.StartsWith("/"))
+                {
+                    coverUrl = new Uri(new Uri(baseUrl), coverUrl).AbsoluteUri;
+                }
+            }
+
+            return new WebNovelInfo()
+            {
+                Title = title,
+                CoverUrl = coverUrl
+            };
         }
 
         public override async Task<WebNovelChapter> GetChapterAsync(ChapterLink link,
