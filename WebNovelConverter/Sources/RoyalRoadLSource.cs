@@ -76,6 +76,7 @@ namespace WebNovelConverter.Sources
                 return null;
 
             RemoveNavigation(firstPostElement);
+            ExpandSpoilers(firstPostElement);
 
             return new WebNovelChapter
             {
@@ -104,6 +105,28 @@ namespace WebNovelConverter.Sources
         protected virtual void RemoveNavigation(IElement rootElement)
         {
             rootElement.Descendents<IElement>().LastOrDefault(p => p.LocalName == "table")?.Remove();
+        }
+
+        /// <summary>
+        /// Expands spoilers in HTML for easy reading.
+        /// Expects:
+        ///     <div class="spoiler_header">Spoilerxxx</div>
+        ///     <div class="spoiler_body" style="display: none;">xxxx</div>
+        /// </summary>
+        /// <param name="rootElement"></param>
+        protected void ExpandSpoilers(IElement rootElement)
+        {
+            foreach(var el in rootElement.QuerySelectorAll(".spoiler_body"))
+            {
+                el.SetAttribute("style", string.Empty);
+                el.SetAttribute("class", string.Empty);
+
+            }
+
+            foreach (var el in rootElement.QuerySelectorAll(".spoiler_header"))
+            {
+                el.Remove();
+            }
         }
     }
 }
