@@ -249,8 +249,8 @@ namespace WebNovelConverter
                 modeSelectedText = "http://" + modeSelectedText;
 
             WebNovelSource source = GetSource(modeSelectedText, type);
-            string coverUrl = await source.GetNovelCoverAsync(modeSelectedText);
-            coverUrl = coverUrl.StartsWith("//") ? coverUrl.Substring(2) : coverUrl;
+
+            WebNovelInfo novelInfo = await source.GetNovelInfoAsync(modeSelectedText);
 
             if (mode == "table of contents")
             {
@@ -270,8 +270,22 @@ namespace WebNovelConverter
                         }
                     }
 
-                    if (!string.IsNullOrEmpty(coverUrl))
-                        coverTextBox.Text = new UriBuilder(coverUrl).Uri.AbsoluteUri;
+                    if (novelInfo != null)
+                    {
+                        if (!string.IsNullOrEmpty(novelInfo.CoverUrl))
+                        {
+                            try
+                            {
+                                string coverUrl = novelInfo.CoverUrl;
+                                coverUrl = coverUrl.StartsWith("//") ? coverUrl.Substring(2) : coverUrl;
+                                coverTextBox.Text = new UriBuilder(coverUrl).Uri.AbsoluteUri;
+                            }
+                            catch (UriFormatException) { }
+                        }
+
+                        if (!string.IsNullOrEmpty(novelInfo.Title))
+                            titleTextBox.Text = novelInfo.Title;
+                    }
 
                     progressBar.Visible = false;
                     retrieveButton.Enabled = true;

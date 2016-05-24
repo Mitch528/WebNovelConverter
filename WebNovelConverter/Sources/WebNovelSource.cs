@@ -13,7 +13,7 @@ using WebNovelConverter.Sources.Models;
 
 namespace WebNovelConverter.Sources
 {
-    public class WebNovelSource
+    public abstract class WebNovelSource
     {
         protected static readonly ChapterLink[] EmptyLinks = new ChapterLink[0];
 
@@ -38,7 +38,12 @@ namespace WebNovelConverter.Sources
             throw new NotImplementedException();
         }
 
-        public virtual Task<string> GetNovelCoverAsync(string baseUrl, CancellationToken token = default(CancellationToken))
+        public virtual Task<WebNovelInfo> GetNovelInfoAsync(string baseUrl, CancellationToken token = default(CancellationToken))
+        {
+            return Task.FromResult((WebNovelInfo)null);
+        }
+
+        public virtual Task<string> GetNovelTitleAsync(string baseUrl, CancellationToken token = default(CancellationToken))
         {
             return Task.FromResult(string.Empty);
         }

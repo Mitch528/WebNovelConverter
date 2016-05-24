@@ -86,6 +86,7 @@
     </Compile>
     <Compile Include="Sources\BakaTsukiSource.cs" />
     <Compile Include="Sources\Models\ChapterRetrievalOptions.cs" />
+    <Compile Include="Sources\Models\WebNovelInfo.cs" />
     <Compile Include="Sources\NovelsNaoSource.cs" />
     <Compile Include="Sources\NovelSourceCollection.cs" />
     <Compile Include="Sources\RoyalRoadLSource.cs" />
