@@ -63,6 +63,9 @@
             this.modeComboBox = new System.Windows.Forms.ComboBox();
             this.label8 = new System.Windows.Forms.Label();
             this.reverseButton = new System.Windows.Forms.Button();
+            this.amountLabel = new System.Windows.Forms.Label();
+            this.amountNumericUpDown = new System.Windows.Forms.NumericUpDown();
+            ((System.ComponentModel.ISupportInitialize)(this.amountNumericUpDown)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -344,9 +347,10 @@
             "WordPress",
             "RoyalRoadL",
             "Baka-Tsuki",
-            "Blogspot"});
+            "Blogspot",
+            "LNMTL"});
             this.websiteTypeComboBox.Location = new System.Drawing.Point(62, 7);
-            this.websiteTypeComboBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.websiteTypeComboBox.Margin = new System.Windows.Forms.Padding(2);
             this.websiteTypeComboBox.Name = "websiteTypeComboBox";
             this.websiteTypeComboBox.Size = new System.Drawing.Size(134, 21);
             this.websiteTypeComboBox.TabIndex = 25;
@@ -358,8 +362,8 @@
             this.modeComboBox.FormattingEnabled = true;
             this.modeComboBox.Items.AddRange(new object[] {
             "Table of Contents"});
-            this.modeComboBox.Location = new System.Drawing.Point(280, 7);
-            this.modeComboBox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.modeComboBox.Location = new System.Drawing.Point(253, 6);
+            this.modeComboBox.Margin = new System.Windows.Forms.Padding(2);
             this.modeComboBox.Name = "modeComboBox";
             this.modeComboBox.Size = new System.Drawing.Size(134, 21);
             this.modeComboBox.TabIndex = 27;
@@ -368,7 +372,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(243, 9);
+            this.label8.Location = new System.Drawing.Point(215, 10);
             this.label8.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(34, 13);
@@ -380,19 +384,45 @@
             this.reverseButton.BackgroundImage = global::WebNovelConverter.Properties.Resources.Rotate_Right_64;
             this.reverseButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
             this.reverseButton.Location = new System.Drawing.Point(284, 143);
-            this.reverseButton.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.reverseButton.Margin = new System.Windows.Forms.Padding(2);
             this.reverseButton.Name = "reverseButton";
             this.reverseButton.Size = new System.Drawing.Size(54, 38);
             this.reverseButton.TabIndex = 23;
             this.reverseButton.UseVisualStyleBackColor = true;
             this.reverseButton.Click += new System.EventHandler(this.reverseButton_Click);
             // 
+            // amountLabel
+            // 
+            this.amountLabel.AutoSize = true;
+            this.amountLabel.Location = new System.Drawing.Point(401, 10);
+            this.amountLabel.Margin = new System.Windows.Forms.Padding(2, 0, 2, 0);
+            this.amountLabel.Name = "amountLabel";
+            this.amountLabel.Size = new System.Drawing.Size(43, 13);
+            this.amountLabel.TabIndex = 28;
+            this.amountLabel.Text = "Amount";
+            this.amountLabel.Visible = false;
+            // 
+            // amountNumericUpDown
+            // 
+            this.amountNumericUpDown.Location = new System.Drawing.Point(449, 7);
+            this.amountNumericUpDown.Maximum = new decimal(new int[] {
+            9999999,
+            0,
+            0,
+            0});
+            this.amountNumericUpDown.Name = "amountNumericUpDown";
+            this.amountNumericUpDown.Size = new System.Drawing.Size(120, 20);
+            this.amountNumericUpDown.TabIndex = 29;
+            this.amountNumericUpDown.Visible = false;
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
-            this.ClientSize = new System.Drawing.Size(625, 663);
+            this.ClientSize = new System.Drawing.Size(625, 642);
+            this.Controls.Add(this.amountNumericUpDown);
+            this.Controls.Add(this.amountLabel);
             this.Controls.Add(this.modeComboBox);
             this.Controls.Add(this.label8);
             this.Controls.Add(this.websiteTypeComboBox);
@@ -426,6 +456,7 @@
             this.Name = "MainForm";
             this.Text = "Web Novel Converter";
             this.Load += new System.EventHandler(this.MainForm_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.amountNumericUpDown)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -466,6 +497,8 @@
         private System.Windows.Forms.ComboBox websiteTypeComboBox;
         private System.Windows.Forms.ComboBox modeComboBox;
         private System.Windows.Forms.Label label8;
+        private System.Windows.Forms.Label amountLabel;
+        private System.Windows.Forms.NumericUpDown amountNumericUpDown;
     }
 }
 

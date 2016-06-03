@@ -23,7 +23,7 @@ namespace WebNovelConverter.Sources
 
         protected readonly HtmlParser Parser = new HtmlParser();
 
-        public WebNovelSource(string sourceName)
+        protected WebNovelSource(string sourceName)
         {
             SourceName = sourceName;
         }

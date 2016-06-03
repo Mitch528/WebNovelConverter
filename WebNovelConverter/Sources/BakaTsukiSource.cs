@@ -30,6 +30,8 @@ namespace WebNovelConverter.Sources
             "interlude"
         };
 
+        private static readonly Regex WidthRegex = new Regex(@"width\=([0-9]+)", RegexOptions.Compiled);
+
         public BakaTsukiSource() : base("BakaTsuki")
         {
         }
@@ -101,7 +103,7 @@ namespace WebNovelConverter.Sources
                 if(coverUrl.Contains("width=") && coverUrlEl.HasAttribute("data-file-width"))
                 {
                     var width = Math.Min(int.Parse(coverUrlEl.Attributes["data-file-width"].Value)-1, 500);
-                    coverUrl = Regex.Replace(coverUrl, @"width\=([0-9]+)", "width=" + width);
+                    coverUrl = WidthRegex.Replace(coverUrl, "width=" + width);
                 }
 
                 // Make URL absolute
@@ -111,7 +113,7 @@ namespace WebNovelConverter.Sources
                 }
             }
 
-            return new WebNovelInfo()
+            return new WebNovelInfo
             {
                 Title = title,
                 CoverUrl = coverUrl

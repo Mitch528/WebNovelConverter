@@ -39,6 +39,7 @@ namespace WebNovelConverter
             _sources.Add(new BakaTsukiSource());
             _sources.Add(new BlogspotSource());
             _sources.Add(new NovelsNaoSource());
+            _sources.Add(new LNMTLSource());
 
             websiteTypeComboBox.SelectedIndex = 0;
             modeComboBox.SelectedIndex = 0;
@@ -152,12 +153,14 @@ namespace WebNovelConverter
 
         private async void convertBackgroundWorker_DoWork(object sender, DoWorkEventArgs e)
         {
+            var items = new List<object>();
             string type = string.Empty;
             string mode = string.Empty;
             Invoke((MethodInvoker)delegate
             {
                 type = ((string)websiteTypeComboBox.SelectedItem).ToLower();
                 mode = ((string)modeComboBox.SelectedItem).ToLower();
+                items.AddRange(chaptersListBox.Items.Cast<object>());
             });
 
             EBook book = new EBook
@@ -165,12 +168,6 @@ namespace WebNovelConverter
                 Title = titleTextBox.Text,
                 CoverImage = coverTextBox.Text
             };
-
-            var items = new List<object>();
-            Invoke((MethodInvoker)delegate
-            {
-                items.AddRange(chaptersListBox.Items.Cast<object>());
-            });
 
             foreach (object obj in items)
             {
@@ -237,12 +234,14 @@ namespace WebNovelConverter
             string type = string.Empty;
             string mode = string.Empty;
             string modeSelectedText = string.Empty;
+            int amount = 0;
 
             Invoke((MethodInvoker)delegate
             {
                 type = ((string)websiteTypeComboBox.SelectedItem).ToLower();
                 mode = ((string)modeComboBox.SelectedItem).ToLower();
                 modeSelectedText = modeSelectedTextBox.Text;
+                amount = (int)amountNumericUpDown.Value;
             });
 
             if (!(modeSelectedText.StartsWith("http://") || modeSelectedText.StartsWith("https://")))
@@ -296,6 +295,7 @@ namespace WebNovelConverter
                 ChapterLink firstChapter = new ChapterLink { Url = modeSelectedText };
                 ChapterLink current = firstChapter;
 
+                int ctr = 1;
                 var chapters = new List<WebNovelChapter>();
                 while (true)
                 {
@@ -323,6 +323,11 @@ namespace WebNovelConverter
                         break;
 
                     current = new ChapterLink { Url = chapter.NextChapterUrl };
+
+                    if (ctr == amount)
+                        break;
+
+                    ctr++;
                 }
 
                 Invoke((MethodInvoker)delegate
@@ -422,6 +427,9 @@ namespace WebNovelConverter
                 case "baka-tsuki":
                     modeComboBox.Items.Add("Table of Contents");
                     break;
+                case "lnmtl":
+                    modeComboBox.Items.Add("Next Chapter Link");
+                    break;
                 default:
                     modeComboBox.Items.Add("Table of Contents");
                     break;
@@ -438,9 +446,15 @@ namespace WebNovelConverter
             {
                 case "table of contents":
                     modeSelectedLabel.Text = "TOC URL";
+
+                    amountLabel.Visible = false;
+                    amountNumericUpDown.Visible = false;
                     break;
                 case "next chapter link":
                     modeSelectedLabel.Text = "Starting Chapter URL";
+
+                    amountLabel.Visible = true;
+                    amountNumericUpDown.Visible = true;
                     break;
             }
 

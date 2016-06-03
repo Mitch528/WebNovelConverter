@@ -69,6 +69,7 @@
   <ItemGroup>
     <Compile Include="Extensions\ElementExtensions.cs" />
     <Compile Include="Sources\BlogspotSource.cs" />
+    <Compile Include="Sources\LNMTLSource.cs" />
     <Compile Include="Sources\Models\ChapterLink.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>

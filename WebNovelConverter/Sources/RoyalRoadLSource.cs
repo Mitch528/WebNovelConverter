@@ -16,6 +16,8 @@ namespace WebNovelConverter.Sources
     {
         public override string BaseUrl => "http://royalroadl.com/";
 
+        private static readonly Regex HtmlCleanupRegex = new Regex("(<br>\\s*){3,}", RegexOptions.Compiled);
+
         public RoyalRoadLSource() : base("RoyalRoadL")
         {
         }
@@ -58,20 +60,20 @@ namespace WebNovelConverter.Sources
             }
         }
 
-        public override async Task<WebNovelChapter> GetChapterAsync(ChapterLink link, 
+        public override async Task<WebNovelChapter> GetChapterAsync(ChapterLink link,
             ChapterRetrievalOptions options = default(ChapterRetrievalOptions),
             CancellationToken token = default(CancellationToken))
         {
             string pageContent = await GetWebPageAsync(link.Url, token);
-            
+
             IHtmlDocument doc = await Parser.ParseAsync(pageContent, token);
-            
+
             IElement postBodyEl = (from e in doc.All
-                                        where e.LocalName == "div"
-                                        where e.HasAttribute("class")
-                                        let classAttribute = e.GetAttribute("class")
-                                        where classAttribute.Contains("post_body")
-                                        select e).FirstOrDefault();
+                                   where e.LocalName == "div"
+                                   where e.HasAttribute("class")
+                                   let classAttribute = e.GetAttribute("class")
+                                   where classAttribute.Contains("post_body")
+                                   select e).FirstOrDefault();
 
             if (postBodyEl == null)
                 return null;
@@ -79,7 +81,7 @@ namespace WebNovelConverter.Sources
             RemoveNavigation(postBodyEl);
             RemoveDonation(postBodyEl);
             ExpandSpoilers(postBodyEl);
-            RemoveEmpyTags(postBodyEl);
+            RemoveEmptyTags(postBodyEl);
 
             var content = CleanupHTML(postBodyEl.InnerHtml);
 
@@ -100,7 +102,7 @@ namespace WebNovelConverter.Sources
             var coverUrl = fictionHeaderDes.Descendents<IElement>().FirstOrDefault(p => p.LocalName == "img")?.GetAttribute("src");
             var title = fictionHeaderDes.QuerySelector("h1.fiction-title")?.TextContent;
 
-            return new WebNovelInfo()
+            return new WebNovelInfo
             {
                 CoverUrl = coverUrl,
                 Title = title
@@ -111,9 +113,10 @@ namespace WebNovelConverter.Sources
         {
             // Last 1-2 tables might be navigation
 
-            foreach(var table in rootElement.QuerySelectorAll("table").Reverse().Take(2))
+            foreach (var table in rootElement.QuerySelectorAll("table").Reverse().Take(2))
             {
-                if( table.QuerySelectorAll("a").Any(x => x.TextContent.Contains("Chapter"))) {
+                if (table.QuerySelectorAll("a").Any(x => x.TextContent.Contains("Chapter")))
+                {
                     table.Remove();
                 }
             }
@@ -137,22 +140,22 @@ namespace WebNovelConverter.Sources
         /// <param name="rootElement"></param>
         protected void ExpandSpoilers(IElement rootElement)
         {
-            foreach(var el in rootElement.QuerySelectorAll(".spoiler_body"))
+            foreach (IElement el in rootElement.QuerySelectorAll(".spoiler_body"))
             {
                 el.SetAttribute("style", string.Empty);
                 el.SetAttribute("class", string.Empty);
 
             }
 
-            foreach (var el in rootElement.QuerySelectorAll(".spoiler_header"))
+            foreach (IElement el in rootElement.QuerySelectorAll(".spoiler_header"))
             {
                 el.Remove();
             }
         }
 
-        private void RemoveEmpyTags(IElement rootElement)
+        private void RemoveEmptyTags(IElement rootElement)
         {
-            foreach (var el in rootElement.QuerySelectorAll("div,span"))
+            foreach (IElement el in rootElement.QuerySelectorAll("div,span"))
             {
                 if (string.IsNullOrWhiteSpace(el.TextContent) && el.ChildElementCount == 0)
                 {
@@ -164,7 +167,7 @@ namespace WebNovelConverter.Sources
         private string CleanupHTML(string html)
         {
             // Too many newlines sometimes
-            html = new Regex("(<br>\\s*){3,}").Replace(html, "<br /><br />");
+            html = HtmlCleanupRegex.Replace(html, "<br /><br />");
 
             return html.Trim();
         }
